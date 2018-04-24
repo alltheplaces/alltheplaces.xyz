@@ -14,7 +14,7 @@ Downloads of the results from all the scrapers:
 
 ## Format
 
-The linked file is a gzipped [ndjson](http://ndjson.org/) where each line is a [GeoJSON feature](https://tools.ietf.org/html/rfc7946#section-3.2).
+The linked file is a gzipped [GeoJSON FeatureCollection](https://tools.ietf.org/html/rfc7946#page-12) where each [`Feature`](https://tools.ietf.org/html/rfc7946#section-3.2) contains data about a single scraped item.
 
 Information about the properties contained in each GeoJSON feature are documented [on the project's GitHub repository](https://github.com/alltheplaces/alltheplaces/blob/master/DATA_FORMAT.md).
 
