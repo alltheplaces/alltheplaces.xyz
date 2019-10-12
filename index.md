@@ -9,7 +9,7 @@ layout: default
 Downloads of the results from all the scrapers:
 
 {% raw %}
-<iframe frameborder="no" border="0" width="400" height="100" scrolling="no" src="https://s3.amazonaws.com/placescraper-results/runs/latest/info_embed.html"></iframe>
+<iframe frameborder="no" border="0" width="400" height="100" scrolling="no" src="https://data.alltheplaces.xyz/runs/latest/info_embed.html"></iframe>
 {% endraw %}
 
 ## Format
