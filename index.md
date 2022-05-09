@@ -12,6 +12,8 @@ Downloads of the results from all the scrapers:
 <iframe frameborder="no" border="0" width="400" height="100" scrolling="no" src="https://data.alltheplaces.xyz/runs/latest/info_embed.html"></iframe>
 {% endraw %}
 
+Also, [check details for the latest build](spiders.html) or [view previous builds](builds.html).
+
 ## Format
 
 The linked file is a gzipped [GeoJSON FeatureCollection](https://tools.ietf.org/html/rfc7946#page-12) where each [`Feature`](https://tools.ietf.org/html/rfc7946#section-3.2) contains data about a single scraped item.
