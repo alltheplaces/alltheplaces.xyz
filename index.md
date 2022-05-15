@@ -4,6 +4,8 @@ layout: default
 
 ![Map with points for a recent run of the scrapers](images/overview-map.png)
 
+[Browse the map](map/)
+
 ## Data Downloads
 
 Downloads of the results from all the scrapers:
