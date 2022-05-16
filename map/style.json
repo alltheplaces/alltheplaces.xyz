@@ -1,0 +1,94 @@
+{
+  "version": 8,
+  "glyphs": "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+  "sources": {
+    "alltheplaces": {
+      "url": "https://all-the-places-338115.web.app/services/output",
+      "type": "vector"
+    },
+    "raster-tiles": {
+      "type": "raster",
+      "tiles": [
+        "https://cartodb-basemaps-a.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png",
+        "https://cartodb-basemaps-b.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png",
+        "https://cartodb-basemaps-c.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png",
+        "https://cartodb-basemaps-d.global.ssl.fastly.net/light_all/{z}/{x}/{y}{ratio}.png"
+      ],
+      "tileSize": 256,
+      "attribution": "© <a href=\"http://www.openstreetmap.org/copyright\"> OpenStreetMap </a> contributors, © <a href=\"https://carto.com/about-carto/\"> CARTO </a>"
+    }
+  },
+  "layers": [
+    {
+      "id": "tiles",
+      "type": "raster",
+      "source": "raster-tiles"
+    },
+    {
+      "id": "output",
+      "type": "circle",
+      "source": "alltheplaces",
+      "source-layer": "alltheplaces",
+      "paint": {
+        "circle-radius": [
+          "interpolate",
+          [
+            "exponential",
+            2
+          ],
+          [
+            "zoom"
+          ],
+          0,
+          2,
+          10,
+          ["*",
+            6,
+            [
+              "number",
+              [
+                "get",
+                "sqrt_point_count"
+              ],
+              1
+            ]
+          ],
+          14,
+          10,
+          22,
+          50
+        ],
+        "circle-color": [
+          "case",
+          [
+            "boolean",
+            [
+              "get",
+              "clustered"
+            ],
+            false
+          ],
+          "rgba(128,0,255,0.7)",
+          "rgba(255,128,0,0.7)"
+        ]
+      }
+    },
+    {
+      "id": "output-text",
+      "type": "symbol",
+      "source": "alltheplaces",
+      "source-layer": "alltheplaces",
+      "minzoom": 11,
+      "layout": {
+        "text-field": [
+          "get",
+          "@spider"
+        ],
+        "text-font": [
+          "Metropolis Regular"
+        ],
+        "text-size": 10
+      }
+    }
+  ]
+}
