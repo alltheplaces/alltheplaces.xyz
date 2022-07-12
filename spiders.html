@@ -7,6 +7,12 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
 
     <title>All the Places Spiders</title>
+    <style>
+        [data-value="0"] {
+            color: red;
+            background-color: pink;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -100,9 +106,9 @@
 
             knownBuilds.forEach(buildName => {
                 if (entry[1][buildName]) {
-                    row.push($("<td>").append(entry[1][buildName].features))
+                    row.push($("<td data-value=\"" + entry[1][buildName].features + "\">").append(entry[1][buildName].features))
                 } else {
-                    row.push($("<td>").append("&nbsp;"))
+                    row.push($("<td data-value=\"0\">").append("&nbsp;"))
                 }
             })
             $("#spider-table").append($("<tr>").append(row))
