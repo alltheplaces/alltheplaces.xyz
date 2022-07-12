@@ -100,9 +100,9 @@
 
             knownBuilds.forEach(buildName => {
                 if (entry[1][buildName]) {
-                    row.push($("<td>").append(entry[1][buildName].features))
+                    row.push($("<td data-value=\"" + entry[1][buildName].features + "\">").append(entry[1][buildName].features))
                 } else {
-                    row.push($("<td>").append("&nbsp;"))
+                    row.push($("<td data-value=\"0\">").append("&nbsp;"))
                 }
             })
             $("#spider-table").append($("<tr>").append(row))
