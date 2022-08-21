@@ -15,15 +15,6 @@
             padding: 10px 100px;
         }
 
-        [data-value="0"] {
-            color: red;
-            background-color: pink;
-        }
-
-        .stability-header {
-            text-align: center !important;
-        }
-
         .stability-box {
             width: 10px;
             height: 10px;
@@ -31,12 +22,12 @@
             background-color: grey;
             position: relative;
             right: 0;
-            margin: auto; 
+            margin: auto;
         }
     </style>
 </head>
 <body>
-    <table id="spider-table" class="display" style="width:100%"></table>
+    <table id="spider-table" class="display compact" style="width:100%"></table>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
@@ -44,8 +35,8 @@
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/fixedcolumns/4.1.0/js/dataTables.fixedColumns.min.js" crossorigin="anonymous"></script>
 <script>
-    var NUM_BUILDS = 10; //max number of builds/runs/columns
-    var MAX_STABILITY = 500; //dont grade a standard deviation any more than this.
+    var NUM_BUILDS = 10; // max number of builds/runs/columns
+    var MAX_STABILITY = 500; // don't grade a standard deviation any more than this.
 
     // Function to process a single history entry
     async function processHistoryEntry(entry) {
@@ -86,17 +77,17 @@
     }
 
     function getColorGradient(percentage) {
-        var red = (percentage > 50 ? 1 - 2 * (percentage - 50) / 100.0 : 1.0) * 255;
-        var green = (percentage > 50 ? 1.0 : 2 * percentage / 100.0) * 255;
-        var blue = 0.0;
-        return "rgb(" + red + "," + green + ",0)";
+        const red = (percentage > 50 ? 1 - 2 * (percentage - 50) / 100.0 : 1.0) * 255,
+              green = (percentage > 50 ? 1.0 : 2 * percentage / 100.0) * 255,
+              blue = 0.0;
+        return `rgb(${red},${green},${blue})`;
     }
 
     // Call the main function.  If you needed to await the results of this,
     // you would need to call if from another async function.
     fetchHistoryEntries().then(recentHistories => {
-        var knownBuilds = [];
-        var buildsBySpider = {};
+        let knownBuilds = [];
+        let buildsBySpider = {};
 
         // Re-pivot the build data by spider
         recentHistories.forEach(historyEntry => {
@@ -117,70 +108,75 @@
 
         // Build the HTML
         // Start with the header
-        var columnNames = [
-            $("<th>").append("Spider"),
-            $("<th class='stability-header'>").append("Stability")
+        let columnNames = [
+            {title: "Spider"},
+            {
+                title: "Stability",
+                render: (data, type, row, meta) => {
+                    // Get a copy of the array with just the build counts
+                    let builds = row.slice(2);
+                    // Count the number of non-null builds
+                    const numValidBuilds = builds.reduce((partialCount, a) => a === null ? partialCount + 0 : partialCount + 1, 0);
+                    const sumFeatures = builds.reduce((partialSum, a) => partialSum + a);
+                    const mean = (numValidBuilds === 0) ? 0 : (sumFeatures / numValidBuilds);
+                    let sumSqDeviations = builds.reduce((partial, a) => {
+                        let dev = a - mean;
+                        return partial + (dev * dev);
+                    });
+                    let variance = sumSqDeviations / numValidBuilds;
+                    let stDev = Math.sqrt(variance);
+                    let perc = 100 - ((Math.min(stDev, MAX_STABILITY) / MAX_STABILITY ) * 100);
+                    return type === "display" ? `<div class="stability-box" style="background-color: ${getColorGradient(perc)}"></div>` : stDev;
+                },
+            },
         ]
 
-        var numberedColumnIndices = [1];
+        let numberedColumnIndices = [1];
 
         knownBuilds.forEach(entry => {
             numberedColumnIndices.push(columnNames.length);
-            columnNames.push($("<th>").append(entry))
-        })
+            columnNames.push({title: entry});
+        });
 
-        $("#spider-table").append($("<thead>").append($("<tr>").append(columnNames)));
-        $("#spider-table").append($("<tbody>"));
+        let rows = [];
 
         Object.entries(buildsBySpider).forEach(entry => {
-            var row = [
-                $("<td>").append(entry[0])
+            let row = [
+                entry[0],
             ]
 
-            // dont count builds which weren't run. DO count them if they are 0.
-            var numValidBuilds = 0;
-            var sumFeatures = 0;
-
             knownBuilds.forEach(buildName => {
                 if (entry[1][buildName]) {
-                    var count = entry[1][buildName].features;
-                    row.push($("<td>").attr("data-value", count).append(count));
-                    numValidBuilds++;
-                    sumFeatures += count;
+                    row.push(entry[1][buildName].features);
                 } else {
-                    row.push($("<td>"))
-                }
-            })
-            var mean = (numValidBuilds == 0) ? 0 : (sumFeatures / numValidBuilds);
-            var sumSqDeviations = 0;
-            knownBuilds.forEach(buildName => {
-                if (entry[1][buildName]) {
-                    var dev = entry[1][buildName].features - mean;
-                    sumSqDeviations += (dev * dev);
+                    row.push(null);
                 }
             });
-            var variance = sumSqDeviations / numValidBuilds;
-            var stDev = Math.sqrt(variance);
-            var box = $("<div class='stability-box'>");
-            if(sumFeatures > 0) {
-                var perc = 100 - ((Math.min(stDev, MAX_STABILITY) / MAX_STABILITY ) * 100);
-                box.css("background-color", getColorGradient(perc));
-            }
-            row.splice(1, 0, $("<td class='stability-cell'>").attr("data-sort", sumFeatures > 0 ? stDev : Infinity).append(box));
-            $("#spider-table tbody").append($("<tr>").append(row));
+
+            row.splice(1, 0, null);
+            rows.push(row);
         });
 
         // initialise datatable on the html we built
-        var dataTable = $("#spider-table").DataTable( {
+        var dataTable = $("#spider-table").DataTable({
             paging: false,
             scrollY: 700,
             scrollX: true,
             scrollCollapse: true,
+            data: rows,
+            columns: columnNames,
+            rowCallback: (row, data) => {
+                $('td', row).slice(2).map((i, c) => {
+                    if (data[i+2] === 0) {
+                        $(c).css("background-color", "pink");
+                    }
+                });
+            },
             columnDefs: [
                 { "type": "num", "className": "text-right", "targets": numberedColumnIndices }
             ],
-            fixedColumns: true
-        } );
+            fixedColumns: true,
+        });
     });
 </script>
 </body>
