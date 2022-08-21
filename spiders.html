@@ -43,7 +43,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/fixedcolumns/4.1.0/js/dataTables.fixedColumns.min.js" crossorigin="anonymous"></script>
-<script>
+<script type=module>
+
     var NUM_BUILDS = 10; //max number of builds/runs/columns
     var MAX_STABILITY = 500; //dont grade a standard deviation any more than this.
 
@@ -63,26 +64,21 @@
 
     // Fetch the recent history
     async function fetchHistoryEntries() {
-        try {
-            // Make the request for `history.json`
-            const historyResponse = await window.fetch('https://data.alltheplaces.xyz/runs/history.json')
+        // Make the request for `history.json`
+        const historyResponse = await window.fetch('https://data.alltheplaces.xyz/runs/history.json')
 
-            // Parse the response as JSON data and return a POJO
-            const history = await historyResponse.json()
+        // Parse the response as JSON data and return a POJO
+        const history = await historyResponse.json()
 
-            // Sort the history by start_time and just use the first N
-            history
-                .sort((a, b) => new Date(a.start_time) < new Date(b.start_time) ? 1 : -1)
-                .splice(NUM_BUILDS)
+        // Sort the history by start_time and just use the first N
+        history
+            .sort((a, b) => new Date(a.start_time) < new Date(b.start_time) ? 1 : -1)
+            .splice(NUM_BUILDS)
 
-            // Wait for each history entry to process (see processHistoryEntry function above)
-            // `historyEntries` will be an array of the result of calling `processHistoryEntry` above
-            // with the 5 entries returned from the sort and splice.
-            return await Promise.all(history.map(processHistoryEntry))
-        } catch (error) {
-            // Any errors thrown during any of the above code will be caught here
-            console.log('There was an error: ', error)
-        }
+        // Wait for each history entry to process (see processHistoryEntry function above)
+        // `historyEntries` will be an array of the result of calling `processHistoryEntry` above
+        // with the 5 entries returned from the sort and splice.
+        return await Promise.all(history.map(processHistoryEntry))
     }
 
     function getColorGradient(percentage) {
@@ -92,96 +88,101 @@
         return "rgb(" + red + "," + green + ",0)";
     }
 
-    // Call the main function.  If you needed to await the results of this,
-    // you would need to call if from another async function.
-    fetchHistoryEntries().then(recentHistories => {
-        var knownBuilds = [];
-        var buildsBySpider = {};
+    const recentHistories = await fetchHistoryEntries();
 
-        // Re-pivot the build data by spider
-        recentHistories.forEach(historyEntry => {
-            knownBuilds.push(historyEntry.run_id)
+    var knownBuilds = [];
+    var buildsBySpider = {};
 
-            historyEntry.results.forEach(resultEntry => {
-                if (!buildsBySpider[resultEntry.spider]) {
-                    buildsBySpider[resultEntry.spider] = {}
-                }
+    // Re-pivot the build data by spider
+    recentHistories.forEach(historyEntry => {
+        knownBuilds.push(historyEntry.run_id)
 
-                buildsBySpider[resultEntry.spider][historyEntry.run_id] = {
-                    errors: resultEntry.errors,
-                    features: resultEntry.features,
-                    elapsed: resultEntry.elapsed_time,
-                }
-            })
-        })
-
-        // Build the HTML
-        // Start with the header
-        var columnNames = [
-            $("<th>").append("Spider"),
-            $("<th class='stability-header'>").append("Stability")
-        ]
-
-        var numberedColumnIndices = [1];
-
-        knownBuilds.forEach(entry => {
-            numberedColumnIndices.push(columnNames.length);
-            columnNames.push($("<th>").append(entry))
-        })
-
-        $("#spider-table").append($("<thead>").append($("<tr>").append(columnNames)));
-        $("#spider-table").append($("<tbody>"));
-
-        Object.entries(buildsBySpider).forEach(entry => {
-            var row = [
-                $("<td>").append(entry[0])
-            ]
-
-            // dont count builds which weren't run. DO count them if they are 0.
-            var numValidBuilds = 0;
-            var sumFeatures = 0;
-
-            knownBuilds.forEach(buildName => {
-                if (entry[1][buildName]) {
-                    var count = entry[1][buildName].features;
-                    row.push($("<td>").attr("data-value", count).append(count));
-                    numValidBuilds++;
-                    sumFeatures += count;
-                } else {
-                    row.push($("<td>"))
-                }
-            })
-            var mean = (numValidBuilds == 0) ? 0 : (sumFeatures / numValidBuilds);
-            var sumSqDeviations = 0;
-            knownBuilds.forEach(buildName => {
-                if (entry[1][buildName]) {
-                    var dev = entry[1][buildName].features - mean;
-                    sumSqDeviations += (dev * dev);
-                }
-            });
-            var variance = sumSqDeviations / numValidBuilds;
-            var stDev = Math.sqrt(variance);
-            var box = $("<div class='stability-box'>");
-            if(sumFeatures > 0) {
-                var perc = 100 - ((Math.min(stDev, MAX_STABILITY) / MAX_STABILITY ) * 100);
-                box.css("background-color", getColorGradient(perc));
+        historyEntry.results.forEach(resultEntry => {
+            if (!buildsBySpider[resultEntry.spider]) {
+                buildsBySpider[resultEntry.spider] = {}
             }
-            row.splice(1, 0, $("<td class='stability-cell'>").attr("data-sort", sumFeatures > 0 ? stDev : Infinity).append(box));
-            $("#spider-table tbody").append($("<tr>").append(row));
-        });
 
-        // initialise datatable on the html we built
-        var dataTable = $("#spider-table").DataTable( {
-            paging: false,
-            scrollY: 700,
-            scrollX: true,
-            scrollCollapse: true,
-            columnDefs: [
-                { "type": "num", "className": "text-right", "targets": numberedColumnIndices }
-            ],
-            fixedColumns: true
-        } );
+            buildsBySpider[resultEntry.spider][historyEntry.run_id] = {
+                errors: resultEntry.errors,
+                features: resultEntry.features,
+                elapsed: resultEntry.elapsed_time,
+            }
+        })
+    })
+
+    // Compute standard deviation and convert to flat tabular format
+    let data = [];
+    Object.entries(buildsBySpider).forEach((entry) => {
+        const row = [entry[0]];
+
+        // dont count builds which weren't run. DO count them if they are 0.
+        let numValidBuilds = 0;
+        let sumFeatures = 0;
+
+        knownBuilds.forEach(run_id => {
+            if (entry[1][run_id]) {
+                numValidBuilds++;
+                sumFeatures += entry[1][run_id].features;
+            }
+        })
+
+        const mean = (numValidBuilds == 0) ? 0 : (sumFeatures / numValidBuilds);
+        let sumSqDeviations = 0;
+        knownBuilds.forEach(run_id => {
+            if (entry[1][run_id]) {
+                let dev = entry[1][run_id].features - mean;
+                sumSqDeviations += (dev * dev);
+            }
+        });
+        const variance = sumSqDeviations / numValidBuilds;
+        const stDev = Math.sqrt(variance);
+        if (sumFeatures > 0) {
+            const perc = 100 - ((Math.min(stDev, MAX_STABILITY) / MAX_STABILITY ) * 100);
+            row.push({stDev, perc});
+        } else {
+            row.push({stDev:null, perc:null});
+        }
+        row.push(...knownBuilds.map(run_id => entry[1][run_id]?.features ?? null));
+        data.push(row);
     });
+
+    // Render with datatable
+    var dataTable = $("#spider-table").DataTable({
+        data,
+        paging: false,
+        scrollY: 700,
+        scrollX: true,
+        scrollCollapse: true,
+        columns: [
+            {
+                title: "Spider",
+            },
+            {
+                title: "Stability",
+                data: {
+                    "sort": "1.stDev",
+                    "_": "1.perc",
+                },
+                createdCell(cell, cellData) {
+                    const box = $("<div>").addClass("stability-box");
+                    if (Number.isFinite(cellData)) {
+                        box.css("background-color", getColorGradient(cellData));
+                    }
+                    $(cell).empty().append(box);
+                },
+            },
+            ...knownBuilds.map((run_id) => ({title:run_id})),
+        ],
+        columnDefs: [
+            {
+                targets: knownBuilds.map((_,i) => i+2),
+                createdCell(cell, cellData) {
+                    cell.dataset.value = cellData;
+                },
+            }
+        ],
+    });
+
 </script>
 </body>
 </html>
