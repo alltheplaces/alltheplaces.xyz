@@ -46,7 +46,6 @@
 <script type=module>
 
     var NUM_BUILDS = 10; //max number of builds/runs/columns
-    var MAX_STABILITY = 500; //dont grade a standard deviation any more than this.
 
     // Function to process a single history entry
     async function processHistoryEntry(entry) {
@@ -137,7 +136,7 @@
         const variance = sumSqDeviations / numValidBuilds;
         const stDev = Math.sqrt(variance);
         if (sumFeatures > 0) {
-            const perc = 100 - ((Math.min(stDev, MAX_STABILITY) / MAX_STABILITY ) * 100);
+            const perc = 100 - ((Math.min(stDev, mean) / mean ) * 100);
             row.push({stDev, perc});
         } else {
             row.push({stDev:null, perc:null});
@@ -153,6 +152,7 @@
         scrollY: 700,
         scrollX: true,
         scrollCollapse: true,
+        fixedColumns: true,
         columns: [
             {
                 title: "Spider",
@@ -160,7 +160,7 @@
             {
                 title: "Stability",
                 data: {
-                    "sort": "1.stDev",
+                    "sort": "1.perc",
                     "_": "1.perc",
                 },
                 createdCell(cell, cellData) {
@@ -176,10 +176,17 @@
         columnDefs: [
             {
                 targets: knownBuilds.map((_,i) => i+2),
+                type: "num",
+                className: "text-right",
                 createdCell(cell, cellData) {
                     cell.dataset.value = cellData;
                 },
-            }
+            },
+            {
+                targets: 1,
+                type: "num",
+                className: "text-right"
+            },
         ],
     });
 
