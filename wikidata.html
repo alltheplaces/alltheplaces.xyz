@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.1.0/css/fixedColumns.dataTables.min.css" crossorigin="anonymous">
+
+    <title>ATP / NSI / OSM</title>
+    <style>
+        body {
+            font-size: 12px;
+            padding: 10px 100px;
+        }
+    </style>
+</head>
+<body>
+    <table id="spider-table" class="display" style="width:100%"></table>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script type=module>
+
+    function isInt(value) {
+        var x;
+        if (isNaN(value)) {
+            return false;
+        }
+        x = parseFloat(value);
+        return (x | 0) === x;
+    }
+
+    // Render with datatable
+    var dataTable = $("#spider-table").DataTable({
+        ajax: "http://localhost:8000/wikidata.json",
+        lengthMenu: [10, 15, 20, 25, 50, 75, 100],
+        pageLength: 15,
+        order: [[2, 'desc']],
+        columns: [
+            {
+                "title": "Wikidata code",
+                "data": "code",
+                "render": function(data, type, row, meta) {
+                    if (type === 'display' && data.startsWith("Q")) {
+                        data = '<a href="https://www.wikidata.org/wiki/' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
+            {"title": "OSM count", "data": "osm_count"},
+            {"title": "ATP count", "data": "atp_count"},
+            {"title": "ATP brand name", "data": "atp_brand"},
+            {"title": "NSI brand name", "data": "nsi_brand"},
+            {"title": "NSI description", "data": "nsi_description"},
+        ],
+        "createdRow": function(row, data, dataIndex, cells) {
+            // TODO: have an issue column and mark it if anything triggers in this method?
+            if (! data['code'].startsWith("Q")) {
+                $(row).css('background-color', 'Pink')
+            }
+            if (isInt(data['atp_count']) && data['osm_count'] > data['atp_count']) {
+                // more data in OSM than ATP is always a red flag
+                $(cells[2]).css('color', 'Red')
+                $(row).css('background-color', 'Pink')
+            }
+            if (data['atp_brand'] && data['nsi_brand'] && ! data['nsi_brand'].startsWith(data['atp_brand'])) {
+                // ATP brand name is only allowed to be a strict or leading match of the NSI brand name
+                $(cells[3]).css('color', 'Red')
+                $(row).css('background-color', 'Pink')
+            }
+            if (data['atp_count'] > 0 && !data['nsi_brand']) {
+                // Something is in ATP but not in NSI, if it's valid then add to NSI!
+                $(row).css('background-color', 'Pink')
+            }
+        },
+    });
+
+</script>
+</body>
+</html>
