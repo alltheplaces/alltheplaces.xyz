@@ -35,6 +35,7 @@
 
     // Render with datatable
     var dataTable = $("#spider-table").DataTable({
+        // This download should come from the result of running the "insights --atp-nsi-osm" command.
         ajax: "http://localhost:8000/wikidata.json",
         lengthMenu: [10, 15, 20, 25, 50, 75, 100],
         pageLength: 15,
@@ -59,20 +60,23 @@
         "createdRow": function(row, data, dataIndex, cells) {
             // TODO: have an issue column and mark it if anything triggers in this method?
             if (! data['code'].startsWith("Q")) {
+                // For sure we do do not have a valid wikidata Q-code, highlight this line.
                 $(row).css('background-color', 'Pink')
             }
             if (isInt(data['atp_count']) && data['osm_count'] > data['atp_count']) {
-                // more data in OSM than ATP is always a red flag
+                // More data in OSM than ATP, highlight this line and the ATP count cell.
                 $(cells[2]).css('color', 'Red')
                 $(row).css('background-color', 'Pink')
             }
             if (data['atp_brand'] && data['nsi_brand'] && ! data['nsi_brand'].startsWith(data['atp_brand'])) {
                 // ATP brand name is only allowed to be a strict or leading match of the NSI brand name
+                // If not then highlight the ATP brand name cell and the whole line.
                 $(cells[3]).css('color', 'Red')
                 $(row).css('background-color', 'Pink')
             }
             if (data['atp_count'] > 0 && !data['nsi_brand']) {
-                // Something is in ATP but not in NSI, if it's valid then add to NSI!
+                // Something is in ATP but not in NSI, if it's valid then perhaps add to NSI?
+                // Highlight the line as worthy of possible attention.
                 $(row).css('background-color', 'Pink')
             }
         },
