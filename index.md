@@ -4,8 +4,6 @@ layout: default
 
 ![Map with points for a recent run of the scrapers](images/overview-map.png)
 
-[Browse the map](map/)
-
 ## Data Downloads
 
 Downloads of the results from all the scrapers:
@@ -14,7 +12,11 @@ Downloads of the results from all the scrapers:
 <iframe frameborder="no" border="0" width="400" height="100" scrolling="no" src="https://data.alltheplaces.xyz/runs/latest/info_embed.html"></iframe>
 {% endraw %}
 
-Also, [check details for the latest build](spiders.html) or [view previous builds](builds.html).
+Other utilities:
+* [Check details for the latest build](spiders.html)
+* [Browse a map from the latest build](map/)
+* [Check Wikidata statistics](wikidata.html)
+* [View previous builds](builds.html)
 
 ## Format
 
