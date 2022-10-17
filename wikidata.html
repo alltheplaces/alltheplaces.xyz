@@ -24,19 +24,26 @@
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 <script type=module>
 
+    async function fetchInsightsJson() {
+        const latestResponse = await window.fetch('https://data.alltheplaces.xyz/runs/latest.json')
+        const latestJson = await latestResponse.json()
+        const insightsResponse = await window.fetch(latestJson.insights_url)
+        const insightsJson = await insightsResponse.json()
+        dataTable.rows.add(insightsJson["data"])
+        dataTable.draw()
+    }
+
+    fetchInsightsJson()
+
     function isInt(value) {
-        var x;
         if (isNaN(value)) {
             return false;
         }
-        x = parseFloat(value);
+        let x = parseFloat(value);
         return (x | 0) === x;
     }
 
-    // Render with datatable
-    var dataTable = $("#spider-table").DataTable({
-        // This download should come from the result of running the "insights --atp-nsi-osm" command.
-        ajax: "http://localhost:8000/wikidata.json",
+    let dataTable = $("#spider-table").DataTable({
         lengthMenu: [10, 15, 20, 25, 50, 75, 100],
         pageLength: 15,
         order: [[2, 'desc']],
@@ -44,7 +51,7 @@
             {
                 "title": "Wikidata code",
                 "data": "code",
-                "render": function(data, type, row, meta) {
+                "render": function (data, type, row, meta) {
                     if (type === 'display' && data.startsWith("Q")) {
                         data = '<a href="https://www.wikidata.org/wiki/' + data + '">' + data + '</a>';
                     }
@@ -57,9 +64,9 @@
             {"title": "NSI brand name", "data": "nsi_brand"},
             {"title": "NSI description", "data": "nsi_description"},
         ],
-        "createdRow": function(row, data, dataIndex, cells) {
+        "createdRow": function (row, data, dataIndex, cells) {
             // TODO: have an issue column and mark it if anything triggers in this method?
-            if (! data['code'].startsWith("Q")) {
+            if (!data['code'].startsWith("Q")) {
                 // For sure we do do not have a valid wikidata Q-code, highlight this line.
                 $(row).css('background-color', 'Pink')
             }
@@ -68,7 +75,7 @@
                 $(cells[2]).css('color', 'Red')
                 $(row).css('background-color', 'Pink')
             }
-            if (data['atp_brand'] && data['nsi_brand'] && ! data['nsi_brand'].startsWith(data['atp_brand'])) {
+            if (data['atp_brand'] && data['nsi_brand'] && !data['nsi_brand'].startsWith(data['atp_brand'])) {
                 // ATP brand name is only allowed to be a strict or leading match of the NSI brand name
                 // If not then highlight the ATP brand name cell and the whole line.
                 $(cells[3]).css('color', 'Red')
