@@ -20,7 +20,10 @@ Other utilities:
 
 ## Format
 
-The linked file is a gzipped [GeoJSON FeatureCollection](https://tools.ietf.org/html/rfc7946#page-12) where each [`Feature`](https://tools.ietf.org/html/rfc7946#section-3.2) contains data about a single scraped item.
+The linked zip file contains the output of each scraper in a separate
+[GeoJSON FeatureCollection](https://tools.ietf.org/html/rfc7946#page-12).
+Each [`Feature`](https://tools.ietf.org/html/rfc7946#section-3.2) contains
+data about a single scraped item.
 
 Information about the properties contained in each GeoJSON feature are documented [on the project's GitHub repository](https://github.com/alltheplaces/alltheplaces/blob/master/DATA_FORMAT.md).
 
