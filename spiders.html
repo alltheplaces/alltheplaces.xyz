@@ -65,7 +65,8 @@
         // Parse the response as JSON data and return a POJO
         const historyEntry = await historyEntryResponse.json()
 
-        historyEntry['run_id'] = entry.start_time.replace(/T.*$/,"");
+        historyEntry['run_id'] = entry.run_id;
+        historyEntry['run_date'] = entry.start_time.replace(/T.*$/,"");
 
         // Return the individual history entry from this function
         return historyEntry
@@ -104,7 +105,10 @@
 
     // Re-pivot the build data by spider
     recentHistories.forEach(historyEntry => {
-        knownBuilds.push(historyEntry.run_id)
+        knownBuilds.push({
+            run_id: historyEntry.run_id,
+            run_date: historyEntry.run_date,
+        });
 
         historyEntry.results.forEach(resultEntry => {
             if (!buildsBySpider[resultEntry.spider]) {
@@ -128,7 +132,8 @@
         let numValidBuilds = 0;
         let sumFeatures = 0;
 
-        knownBuilds.forEach(run_id => {
+        knownBuilds.forEach(run_info => {
+            const run_id = run_info.run_id;
             if (entry[1][run_id]) {
                 numValidBuilds++;
                 sumFeatures += entry[1][run_id].features;
@@ -137,7 +142,8 @@
 
         const mean = (numValidBuilds == 0) ? 0 : (sumFeatures / numValidBuilds);
         let sumSqDeviations = 0;
-        knownBuilds.forEach(run_id => {
+        knownBuilds.forEach(run_info => {
+            const run_id = run_info.run_id;
             if (entry[1][run_id]) {
                 let dev = entry[1][run_id].features - mean;
                 sumSqDeviations += (dev * dev);
@@ -151,7 +157,7 @@
         } else {
             row.push({stDev:null, perc:null});
         }
-        row.push(...knownBuilds.map(run_id => entry[1][run_id]?.features ?? null));
+        row.push(...knownBuilds.map(run_info => entry[1][run_info.run_id]?.features ?? null));
         data.push(row);
     });
 
@@ -180,7 +186,18 @@
                     $(cell).empty().append(box);
                 },
             },
-            ...knownBuilds.map((run_id) => ({title:run_id})),
+            ...knownBuilds.map((run_info) => ({
+                title: run_info.run_date,
+                createdCell(cell, cellData, rowData) {
+                    const spider_name = rowData[0];
+                    const href = $("<a>", {
+                        href: `https://data.alltheplaces.xyz/runs/${run_info.run_id}/output/${spider_name}.geojson`,
+                        text: cellData,
+                    });
+                    cell.setAttribute("data-value", cellData);
+                    $(cell).empty().append(href);
+                },
+            })),
         ],
         columnDefs: [
             {
