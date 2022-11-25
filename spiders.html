@@ -194,6 +194,7 @@
                         href: `https://data.alltheplaces.xyz/runs/${run_info.run_id}/output/${spider_name}.geojson`,
                         text: cellData,
                     });
+                    cell.setAttribute("data-value", cellData);
                     $(cell).empty().append(href);
                 },
             })),
