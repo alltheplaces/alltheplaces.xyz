@@ -53,7 +53,7 @@
                     $("<td>").append($("<a>").attr("href", build.stats_url).append(build.run_id)),
                     $("<td>").append(Number(build.spiders).toLocaleString()),
                     $("<td>").append(Number(build.total_lines).toLocaleString()),
-                    $("<td>").append($("<a>").attr("href", build.output_url).append("Download " + formatBytes(build.size_bytes * 1024, 1))),
+                    $("<td>").append($("<a>").attr("href", build.output_url).append("Download " + formatBytes(build.size_bytes, 1))),
                 )
             );
         });
