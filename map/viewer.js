@@ -73,6 +73,15 @@ function renderFeature(feature) {
         a.textContent = v;
         return a;
       }
+      case "nsi_id": {
+        const a = document.createElement("a");
+        a.target = "_blank";
+        const u = new URL("https://nsi.guide/");
+        u.searchParams.set("id", v);
+        a.href = u;
+        a.textContent = v;
+        return a;
+      }
       case "@spider": {
         const a = document.createElement("a");
         a.target = "_blank";
