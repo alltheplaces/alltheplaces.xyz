@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.1.0/css/fixedColumns.dataTables.min.css" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
     <title>ATP / NSI / OSM</title>
     <style>
@@ -14,26 +14,118 @@
             font-size: 12px;
             padding: 10px 100px;
         }
+        .insight-label {
+            margin-left: 10px;
+        }
+        .insight-label>select {
+            height: 25px;
+        }
+        .insight-files {
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
-    <table id="spider-table" class="display" style="width:100%"></table>
+    <table id="spider-table" class="display" style="width:100%">
+        <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
 <script type=module>
 
-    async function fetchInsightsJson() {
-        const latestResponse = await window.fetch('https://data.alltheplaces.xyz/runs/latest.json')
-        const latestJson = await latestResponse.json()
-        const insightsResponse = await window.fetch(latestJson.insights_url)
+    async function fetchHistoriesConfig() {
+        // The default configuration is the direct ATP history.json
+        let my_histories = [
+            {
+                "name": "ATP",
+                "url": "https://data.alltheplaces.xyz/runs/history.json",
+            },
+        ]
+        try {
+            // Try and load a config.json file from the serving context. If present then this
+            // will override the default configuration above.
+            const response = await window.fetch('./config.json')
+            if (response.status === 200) {
+                let json_response = await response.json()
+                my_histories = json_response["histories"]
+            }
+        } catch (error) {
+            // We catch the exception and proceed here as it enables the HTML to be used by the broswer
+            // on the local file system without crashing out. Handy for development sometimes.
+            console.error(error)
+        }
+        let insight_runs = []
+        for (let i = 0; i < my_histories.length; i++) {
+            // Now for each history list go and retrieve the full list and filter down to those with
+            // an "insights" URL.
+            let history_response = await window.fetch(my_histories[i].url)
+            if (history_response.status === 200) {
+                let history_json_response = await history_response.json()
+                for (let j = 0; j < history_json_response.length; j++) {
+                    let run_data = history_json_response[j]
+                    if ("insights_url" in run_data) {
+                        // It's better that URLs in the JSON are relative as that helps when we
+                        // may need to move things around etc, so cope with it.
+                        if (! run_data["insights_url"].startsWith("http")) {
+                            // Make URL absolute with respect to serving history.json
+                            run_data["insights_url"] = new URL(run_data["insights_url"], history_response.url).toString()
+                        }
+                        run_data["name"] = run_data["run_id"] + " (" + my_histories[i].name + ")"
+                        insight_runs.push(run_data)
+                    }
+                }
+            }
+        }
+        // Sort into most recent first order, select most recent.
+        insight_runs.sort((a, b) => (a["run_id"] < b["run_id"]) ? 1 : ((b["run_id"] < a["run_id"]) ? -1 : 0))
+        let default_run = insight_runs[0]
+        console.log(insight_runs)
+
+        $('div.insight-files').html('<label class="insight-label">Select <select id="insight-select" aria-controls="spider-table" class></select> run</label>');
+        let selectElement = document.getElementById('insight-select');
+        for (let i = 0; i < insight_runs.length; i++) {
+            selectElement.add(new Option(insight_runs[i]["name"], insight_runs[i]["insights_url"]));
+        }
+        selectElement.onchange = newInsightsJsonSelected;
+        await loadInsights(default_run["insights_url"])
+    }
+
+    async function loadInsights(url) {
+        dataTable.clear()
+        dataTable.draw()
+        const insightsResponse = await window.fetch(url)
         const insightsJson = await insightsResponse.json()
+        // If we encounter an insights JSON without the newer fields then we add them dynamically
+        // so that the new DataTables config does not error i.e. backwards compatability for now.
+        if (!("atp_country_count" in insightsJson["data"][0])) {
+            for (let i = 0; i < insightsJson["data"].length; i++) {
+                insightsJson["data"][i]["atp_country_count"] = ""
+                insightsJson["data"][i]["atp_supplier_count"] = ""
+            }
+        }
         dataTable.rows.add(insightsJson["data"])
         dataTable.draw()
     }
 
-    fetchInsightsJson()
+    function newInsightsJsonSelected() {
+        let selectElement = document.getElementById('insight-select');
+        loadInsights(selectElement.value)
+    }
+
+    fetchHistoriesConfig()
 
     function isInt(value) {
         if (isNaN(value)) {
@@ -45,11 +137,16 @@
 
     let dataTable = $("#spider-table").DataTable({
         lengthMenu: [10, 15, 20, 25, 50, 75, 100],
-        pageLength: 15,
-        order: [[2, 'desc']],
+        pageLength: 10,
+        dom: 'l<"insight-files">frtip',
+        order: [[1, 'desc']],
+        columnDefs: [
+            { className: 'dt-center', targets: [0,5,6] },
+            { className: 'dt-right', targets: [1,2,3,4] },
+        ],
         columns: [
             {
-                "title": "Wikidata code",
+                "title": "Wikidata",
                 "data": "code",
                 "render": function (data, type, row, meta) {
                     if (type === 'display' && data.startsWith("Q")) {
@@ -60,14 +157,40 @@
             },
             {"title": "OSM count", "data": "osm_count"},
             {"title": "ATP count", "data": "atp_count"},
-            {"title": "ATP brand name", "data": "atp_brand"},
-            {"title": "NSI brand name", "data": "nsi_brand"},
+            {"title": "Countries", "data": "atp_country_count"},
+            {"title": "Spiders", "data": "atp_supplier_count"},
+            {"title": "ATP brand", "data": "atp_brand"},
+            {
+                "title": "NSI brand",
+                "data": "nsi_brand",
+                "render": function (data, type, row, meta) {
+                    if (type === 'display' && data) {
+                        data = '<a href="https://nsi.guide/index.html?t=brands&tt=' + data + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
             {"title": "NSI description", "data": "nsi_description"},
         ],
+        "footerCallback": function (row, data, start, end, display) {
+            var api = this.api()
+            // Total up the numeric columns (all next to each)
+            var columns = [1,2,3,4]
+            for (var i in columns) {
+                var total = api
+                    .column(columns[i], {filter: "applied"})
+                    .data()
+                    .reduce(function (a, b) {
+                        return a + b;
+                    }, 0);
+                // Update total in footer
+                $(api.column(columns[i]).footer()).html(total);
+            }
+        },
         "createdRow": function (row, data, dataIndex, cells) {
             // TODO: have an issue column and mark it if anything triggers in this method?
             if (!data['code'].startsWith("Q")) {
-                // For sure we do do not have a valid wikidata Q-code, highlight this line.
+                // For sure we do not have a valid wikidata Q-code, highlight this line.
                 $(row).css('background-color', 'Pink')
             }
             if (isInt(data['atp_count']) && data['osm_count'] > data['atp_count']) {
@@ -78,7 +201,7 @@
             if (data['atp_brand'] && data['nsi_brand'] && !data['nsi_brand'].startsWith(data['atp_brand'])) {
                 // ATP brand name is only allowed to be a strict or leading match of the NSI brand name
                 // If not then highlight the ATP brand name cell and the whole line.
-                $(cells[3]).css('color', 'Red')
+                $(cells[5]).css('color', 'Red')
                 $(row).css('background-color', 'Pink')
             }
             if (data['atp_count'] > 0 && !data['nsi_brand']) {
