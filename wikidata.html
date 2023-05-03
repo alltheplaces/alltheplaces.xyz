@@ -89,9 +89,8 @@
                 }
             }
         }
-        // Sort into most recent first order, select most recent.
+        // Sort into most recent first order.
         insight_runs.sort((a, b) => (a["run_id"] < b["run_id"]) ? 1 : ((b["run_id"] < a["run_id"]) ? -1 : 0))
-        let default_run = insight_runs[0]
         console.log(insight_runs)
 
         $('div.insight-files').html('<label class="insight-label">Select <select id="insight-select" aria-controls="spider-table" class></select> run</label>');
@@ -100,7 +99,8 @@
             selectElement.add(new Option(insight_runs[i]["name"], insight_runs[i]["insights_url"]));
         }
         selectElement.onchange = newInsightsJsonSelected;
-        await loadInsights(default_run["insights_url"])
+        // Select the most recent run to display initially.
+        await loadInsights(insight_runs[0]["insights_url"])
     }
 
     async function loadInsights(url) {
@@ -121,8 +121,7 @@
     }
 
     function newInsightsJsonSelected() {
-        let selectElement = document.getElementById('insight-select');
-        loadInsights(selectElement.value)
+        loadInsights(document.getElementById('insight-select').value)
     }
 
     fetchHistoriesConfig()
@@ -173,18 +172,18 @@
             {"title": "NSI description", "data": "nsi_description"},
         ],
         "footerCallback": function (row, data, start, end, display) {
-            var api = this.api()
+            let api = this.api()
             // Total up the numeric columns (all next to each)
-            var columns = [1,2,3,4]
-            for (var i in columns) {
-                var total = api
+            let columns = [1,2,3,4]
+            for (let i in columns) {
+                let total = api
                     .column(columns[i], {filter: "applied"})
                     .data()
                     .reduce(function (a, b) {
                         return a + b;
                     }, 0);
                 // Update total in footer
-                $(api.column(columns[i]).footer()).html(total);
+                $(api.column(columns[i]).footer()).html(total.toLocaleString("us-US"));
             }
         },
         "createdRow": function (row, data, dataIndex, cells) {
