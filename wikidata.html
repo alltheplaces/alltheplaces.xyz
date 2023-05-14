@@ -44,64 +44,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="./shared.js"></script>
 <script type=module>
-
-    async function fetchHistoriesConfig() {
-        // The default configuration is the direct ATP history.json
-        let my_histories = [
-            {
-                "name": "ATP",
-                "url": "https://data.alltheplaces.xyz/runs/history.json",
-            },
-        ]
-        try {
-            // Try and load a config.json file from the serving context. If present then this
-            // will override the default configuration above.
-            const response = await window.fetch('./config.json')
-            if (response.status === 200) {
-                let json_response = await response.json()
-                my_histories = json_response["histories"]
-            }
-        } catch (error) {
-            // We catch the exception and proceed here as it enables the HTML to be used by the broswer
-            // on the local file system without crashing out. Handy for development sometimes.
-            console.error(error)
-        }
-        let insight_runs = []
-        for (let i = 0; i < my_histories.length; i++) {
-            // Now for each history list go and retrieve the full list and filter down to those with
-            // an "insights" URL.
-            let history_response = await window.fetch(my_histories[i].url)
-            if (history_response.status === 200) {
-                let history_json_response = await history_response.json()
-                for (let j = 0; j < history_json_response.length; j++) {
-                    let run_data = history_json_response[j]
-                    if ("insights_url" in run_data) {
-                        // It's better that URLs in the JSON are relative as that helps when we
-                        // may need to move things around etc, so cope with it.
-                        if (! run_data["insights_url"].startsWith("http")) {
-                            // Make URL absolute with respect to serving history.json
-                            run_data["insights_url"] = new URL(run_data["insights_url"], history_response.url).toString()
-                        }
-                        run_data["name"] = run_data["run_id"] + " (" + my_histories[i].name + ")"
-                        insight_runs.push(run_data)
-                    }
-                }
-            }
-        }
-        // Sort into most recent first order.
-        insight_runs.sort((a, b) => (a["run_id"] < b["run_id"]) ? 1 : ((b["run_id"] < a["run_id"]) ? -1 : 0))
-        console.log(insight_runs)
-
-        $('div.insight-files').html('<label class="insight-label">Select <select id="insight-select" aria-controls="spider-table" class></select> run</label>');
-        let selectElement = document.getElementById('insight-select');
-        for (let i = 0; i < insight_runs.length; i++) {
-            selectElement.add(new Option(insight_runs[i]["name"], insight_runs[i]["insights_url"]));
-        }
-        selectElement.onchange = newInsightsJsonSelected;
-        // Select the most recent run to display initially.
-        await loadInsights(insight_runs[0]["insights_url"])
-    }
 
     async function loadInsights(url) {
         dataTable.clear()
@@ -124,7 +68,17 @@
         loadInsights(document.getElementById('insight-select').value)
     }
 
-    fetchHistoriesConfig()
+    const historyList = fetchHistoryList()
+    console.log(historyList)
+
+    $('div.insight-files').html('<label class="insight-label">Select <select id="insight-select" aria-controls="spider-table" class></select> run</label>');
+    let selectElement = document.getElementById('insight-select');
+    for (let i = 0; i < historyList.length; i++) {
+        selectElement.add(new Option(historyList[i]["name"], historyList[i]["insights_url"]));
+    }
+    selectElement.onchange = newInsightsJsonSelected;
+    // Select the most recent run to display initially.
+    await loadInsights(historyList[0]["insights_url"])
 
     function isInt(value) {
         if (isNaN(value)) {
