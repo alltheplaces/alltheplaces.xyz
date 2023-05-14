@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.1.0/css/fixedColumns.dataTables.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
     <title>All the Places Spiders</title>
     <style>
@@ -42,110 +42,108 @@
             right: 0;
             margin: auto; 
         }
+
+        .selector-label {
+            margin-left: 20px;
+        }
+        .selector-label>select {
+            height: 25px;
+        }
+        .selector-div {
+            display: inline-block;
+        }
+
     </style>
 </head>
 <body>
-    <table id="spider-table" class="display" style="width:100%"></table>
+    <table id="spider-table" class="display" style="width:100%">
+        <tfoot>
+            <tr>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </tfoot>
+    </table>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.datatables.net/fixedcolumns/4.1.0/js/dataTables.fixedColumns.min.js" crossorigin="anonymous"></script>
-<script type=module>
+    <script src="./shared.js"></script>
 
-    var NUM_BUILDS = 10; //max number of builds/runs/columns
-    var MAX_STABILITY = 500; //dont grade a standard deviation any more than this.
-
-    // Function to process a single history entry
-    async function processHistoryEntry(entry) {
-        // Make the request for the `stats_url` of this entry
-        const historyEntryResponse = await window.fetch(entry.stats_url)
-
-        // Parse the response as JSON data and return a POJO
-        const historyEntry = await historyEntryResponse.json()
-
-        historyEntry['run_id'] = entry.run_id;
-        historyEntry['run_date'] = entry.start_time.replace(/T.*$/,"");
-
-        // Return the individual history entry from this function
-        return historyEntry
-    }
-
-    // Fetch the recent history
-    async function fetchHistoryEntries() {
-        // Make the request for `history.json`
-        const historyResponse = await window.fetch('https://data.alltheplaces.xyz/runs/history.json')
-
-        // Parse the response as JSON data and return a POJO
-        const history = await historyResponse.json()
-
-        // Sort the history by start_time and just use the first N
-        history
-            .sort((a, b) => new Date(a.start_time) < new Date(b.start_time) ? 1 : -1)
-            .splice(NUM_BUILDS)
-
-        // Wait for each history entry to process (see processHistoryEntry function above)
-        // `historyEntries` will be an array of the result of calling `processHistoryEntry` above
-        // with the 5 entries returned from the sort and splice.
-        return await Promise.all(history.map(processHistoryEntry))
-    }
+    <script type=module>
 
     function getColorGradient(percentage) {
-        var red = (percentage > 50 ? 1 - 2 * (percentage - 50) / 100.0 : 1.0) * 255;
-        var green = (percentage > 50 ? 1.0 : 2 * percentage / 100.0) * 255;
-        var blue = 0.0;
+        let red = (percentage > 50 ? 1 - 2 * (percentage - 50) / 100.0 : 1.0) * 255;
+        let green = (percentage > 50 ? 1.0 : 2 * percentage / 100.0) * 255;
         return "rgb(" + red + "," + green + ",0)";
     }
 
-    const recentHistories = await fetchHistoryEntries();
+    let NUM_BUILDS = 5; // Maximum number of builds to display.
+    let MAX_STABILITY = 500;  // Don't grade a standard deviation any more than this.
 
-    var knownBuilds = [];
-    var buildsBySpider = {};
+    // Fetch the stats JSON for a particular run.
+    async function fetchStatsForHistoryListEntry(entry) {
+        const statsResponse = await window.fetch(entry["stats_url"])
+        const stats = await statsResponse.json()
+        stats["name"] = entry["name"]
+        return stats
+    }
 
-    // Re-pivot the build data by spider
-    recentHistories.forEach(historyEntry => {
-        knownBuilds.push({
-            run_id: historyEntry.run_id,
-            run_date: historyEntry.run_date,
-        });
+    const historyList = await fetchHistoryList();
+    historyList.splice(NUM_BUILDS)
+    console.log(historyList)
+    // Fetch the stats JSON for the runs we will be rendering.
+    const statsList = await Promise.all(historyList.map(fetchStatsForHistoryListEntry))
 
-        historyEntry.results.forEach(resultEntry => {
-            if (!buildsBySpider[resultEntry.spider]) {
-                buildsBySpider[resultEntry.spider] = {}
+    // Re-pivot the build data by spider.
+    let buildsBySpider = {};
+    statsList.forEach(statsRun => {
+        let runName = statsRun["name"]
+        statsRun.results.forEach(spiderEntry => {
+            let spiderName = spiderEntry["spider"]
+            if (!buildsBySpider[spiderName]) {
+                buildsBySpider[spiderName] = {}
             }
-
-            buildsBySpider[resultEntry.spider][historyEntry.run_id] = {
-                errors: resultEntry.errors,
-                features: resultEntry.features,
-                elapsed: resultEntry.elapsed_time,
+            buildsBySpider[spiderName][runName] = {
+                errors: spiderEntry["errors"],
+                features: spiderEntry["features"],
+                elapsed: spiderEntry["elapsed_time"],
             }
         })
     })
 
-    // Compute standard deviation and convert to flat tabular format
+    // Compute standard deviation and convert to flat tabular format.
     let data = [];
-    Object.entries(buildsBySpider).forEach((entry) => {
+    Object.entries(buildsBySpider).forEach(entry => {
+
+        // Set spider name as the first entry in the row.
         const row = [entry[0]];
 
-        // dont count builds which weren't run. DO count them if they are 0.
+        // Only count builds which were run (i.e. have a numeric, possibly zero, entry).
         let numValidBuilds = 0;
         let sumFeatures = 0;
 
-        knownBuilds.forEach(run_info => {
-            const run_id = run_info.run_id;
-            if (entry[1][run_id]) {
+        statsList.forEach(statsRun => {
+            let runName = statsRun["name"]
+            if (entry[1][runName]) {
                 numValidBuilds++;
-                sumFeatures += entry[1][run_id].features;
+                sumFeatures += entry[1][runName].features;
             }
         })
 
-        const mean = (numValidBuilds == 0) ? 0 : (sumFeatures / numValidBuilds);
+        const mean = (numValidBuilds === 0) ? 0 : (sumFeatures / numValidBuilds);
         let sumSqDeviations = 0;
-        knownBuilds.forEach(run_info => {
-            const run_id = run_info.run_id;
-            if (entry[1][run_id]) {
-                let dev = entry[1][run_id].features - mean;
+        statsList.forEach(statsRun => {
+            let runName = statsRun["name"]
+            if (entry[1][runName]) {
+                let dev = entry[1][runName].features - mean;
                 sumSqDeviations += (dev * dev);
             }
         });
@@ -157,17 +155,34 @@
         } else {
             row.push({stDev:null, perc:null});
         }
-        row.push(...knownBuilds.map(run_info => entry[1][run_info.run_id]?.features ?? null));
+
+        // Now push the number of features in each run for this spider on to the row.
+        statsList.forEach(statsRun => {
+            let runName = statsRun["name"]
+            row.push(entry[1][runName]?.features ?? null)
+        })
+
+        // Finally add the row to the data table
         data.push(row);
     });
 
+    // Default link format is Featire GeoJSON, the selector in the table header can change this.
+    let linkFormat = "geojson";
+    function onLinkFormatChange() {
+        linkFormat = document.getElementById('format-select').value
+        dataTable.draw()
+    }
+
     // Render with datatable
-    var dataTable = $("#spider-table").DataTable({
+    let dataTable = $("#spider-table").DataTable({
         data,
-        paging: false,
-        scrollY: 700,
-        scrollX: true,
-        scrollCollapse: true,
+        lengthMenu: [
+            [10, 15, 20, 25, 50, 75, 100, -1],
+            [10, 15, 20, 25, 50, 75, 100, "All"],
+        ],
+        pageLength: 10,
+        dom: 'l<"selector-div">frtip',
+        order: [[2, 'desc']],
         columns: [
             {
                 title: "Spider",
@@ -186,29 +201,69 @@
                     $(cell).empty().append(box);
                 },
             },
-            ...knownBuilds.map((run_info) => ({
-                title: run_info.run_date,
+            ...historyList.map(historyEntry => ({
+                title: historyEntry["name"],
                 createdCell(cell, cellData, rowData) {
-                    const spider_name = rowData[0];
-                    const href = $("<a>", {
-                        href: `https://data.alltheplaces.xyz/runs/${run_info.run_id}/output/${spider_name}.geojson`,
-                        text: cellData,
-                    });
-                    cell.setAttribute("data-value", cellData);
-                    $(cell).empty().append(href);
+                    if (cellData || cellData === 0) {
+                        cell.setAttribute("data-value", cellData);
+                    }
                 },
             })),
         ],
         columnDefs: [
             {
-                targets: knownBuilds.map((_,i) => i+2),
+                className: 'dt-center', targets: [1]
+            },
+            {
+                className: 'dt-right', targets: [2,3,4,5,6]
+            },
+            {
+                targets: statsList.map((_, i) => i + 2),
                 createdCell(cell, cellData) {
                     cell.dataset.value = cellData;
                 },
             }
         ],
+        "footerCallback": function (row, data, start, end, display) {
+            let api = this.api()
+            // Total up the numeric columns (all next to each)
+            let columns = [2,3,4,5,6]
+            for (let i in columns) {
+                let total = api
+                    .column(columns[i], {filter: "applied"})
+                    .data()
+                    .reduce(function (a, b) {
+                        return a + b;
+                    }, 0);
+                // Update total in footer
+                $(api.column(columns[i]).footer()).html(total.toLocaleString("us-US"));
+            }
+        },
+        "rowCallback": function(row, data, displayNum, displayIndex, dataIndex) {
+            for (let i = 2; i <= 7; i++) {
+                if (data[i] || data[i] === 0) {
+                    let linkUrl = null
+                    if ((linkFormat === "geojson") && historyList[i - 2]["output_url"]) {
+                        linkUrl = new URL("output/" + data[0] + ".geojson", historyList[i - 2]["output_url"]).toString()
+                    }
+                    else if ((linkFormat === "statistics") && historyList[i - 2]["stats_url"]) {
+                        linkUrl = new URL(data[0] + ".json", historyList[i - 2]["stats_url"]).toString()
+                    }
+                    let linkData = data[i].toLocaleString("us-US")
+                    if (linkUrl) {
+                        $('td:eq(' + i + ')', row).html('<a href ="' + linkUrl + '">' + linkData + '</a>');
+                    }
+                    else {
+                        $('td:eq(' + i + ')', row).html(linkData);
+                    }
+                }
+            }
+        },
     });
 
-</script>
+    $('div.selector-div').html('<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table"><option value="geojson">Feature GeoJSON</option><option value="statistics">Spider stats JSON</option></select></label>');
+    document.getElementById('format-select').onchange = onLinkFormatChange
+
+    </script>
 </body>
 </html>
