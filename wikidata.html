@@ -68,17 +68,8 @@
         loadInsights(document.getElementById('insight-select').value)
     }
 
-    const historyList = fetchHistoryList()
+    const historyList = await fetchHistoryList()
     console.log(historyList)
-
-    $('div.insight-files').html('<label class="insight-label">Select <select id="insight-select" aria-controls="spider-table" class></select> run</label>');
-    let selectElement = document.getElementById('insight-select');
-    for (let i = 0; i < historyList.length; i++) {
-        selectElement.add(new Option(historyList[i]["name"], historyList[i]["insights_url"]));
-    }
-    selectElement.onchange = newInsightsJsonSelected;
-    // Select the most recent run to display initially.
-    await loadInsights(historyList[0]["insights_url"])
 
     function isInt(value) {
         if (isNaN(value)) {
@@ -164,6 +155,15 @@
             }
         },
     });
+
+    $('div.insight-files').html('<label class="insight-label">Select <select id="insight-select" aria-controls="spider-table" class></select> run</label>');
+    let selectElement = document.getElementById('insight-select');
+    for (let i = 0; i < historyList.length; i++) {
+        selectElement.add(new Option(historyList[i]["name"], historyList[i]["insights_url"]));
+    }
+    selectElement.onchange = newInsightsJsonSelected;
+    // Select the most recent run to display initially.
+    await loadInsights(historyList[0]["insights_url"])
 
 </script>
 </body>
