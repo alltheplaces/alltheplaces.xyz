@@ -249,6 +249,9 @@
                     else if ((linkFormat === "statistics") && historyList[i - 2]["stats_url"]) {
                         linkUrl = new URL(data[0] + ".json", historyList[i - 2]["stats_url"]).toString()
                     }
+                    else if ((linkFormat === "logs") && historyList[i - 2]["logs_url"]) {
+                        linkUrl = new URL("logs/" + data[0] + ".txt", historyList[i - 2]["logs_url"]).toString()
+                    }
                     let linkData = data[i].toLocaleString("us-US")
                     if (linkUrl) {
                         $('td:eq(' + i + ')', row).html('<a href ="' + linkUrl + '">' + linkData + '</a>');
@@ -261,7 +264,7 @@
         },
     });
 
-    $('div.selector-div').html('<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table"><option value="geojson">Feature GeoJSON</option><option value="statistics">Spider stats JSON</option></select></label>');
+    $('div.selector-div').html('<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table"><option value="geojson">Feature GeoJSON</option><option value="statistics">Spider stats JSON</option><option value="logs">Spider error logs</option></select></label>');
     document.getElementById('format-select').onchange = onLinkFormatChange
 
     </script>
