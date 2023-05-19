@@ -249,7 +249,7 @@
                     else if ((linkFormat === "statistics") && historyList[i - 2]["stats_url"]) {
                         linkUrl = new URL(data[0] + ".json", historyList[i - 2]["stats_url"]).toString()
                     }
-                    else if ((linkFormat === "logs") && historyList[i - 2]["logs_url"]) {
+                    else if ((linkFormat === "logs") && historyList[i - 2]["output_url"]) {
                         linkUrl = new URL("logs/" + data[0] + ".txt", historyList[i - 2]["output_url"]).toString()
                     }
                     let linkData = data[i].toLocaleString("us-US")
