@@ -32,7 +32,7 @@ async function fetchHistoryList() {
                 let run_data = history_json_response[j]
                 // It's better that URLs in the JSON are relative as that helps when we
                 // may need to move things around etc, so cope with it.
-                for (const field of ["insights_url", "output_url", "stats_url"]) {
+                for (const field of ["insights_url", "output_url", "stats_url", "logs_url"]) {
                     if (field in run_data) {
                         // Make URL absolute with respect to serving history.json
                         if (!run_data[field].startsWith("http")) {
