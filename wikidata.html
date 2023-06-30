@@ -37,6 +37,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
+                <th></th>
             </tr>
         </tfoot>
     </table>
@@ -52,12 +53,45 @@
         dataTable.draw()
         const insightsResponse = await window.fetch(url)
         const insightsJson = await insightsResponse.json()
-        // If we encounter an insights JSON without the newer fields then we add them dynamically
-        // so that the new DataTables config does not error i.e. backwards compatability for now.
-        if (!("atp_country_count" in insightsJson["data"][0])) {
-            for (let i = 0; i < insightsJson["data"].length; i++) {
-                insightsJson["data"][i]["atp_country_count"] = ""
-                insightsJson["data"][i]["atp_supplier_count"] = ""
+        let data = insightsJson["data"]
+        if (!("atp_country_count" in data[0])) {
+            // If we encounter an insights JSON without the newer fields then we add them dynamically
+            // so that the new DataTables config does not error i.e. backwards compatability for now.
+            for (let i = 0; i < data.length; i++) {
+                data[i]["atp_country_count"] = ""
+                data[i]["atp_supplier_count"] = ""
+            }
+        }
+        else {
+            // Re-calculate the "atp_count" (number of POIs) based on the sum across all countries
+            // of the largest contributing spider in each area.
+            // It might be that we move this calculation to the "insights" command at some point
+            // but for now as it is here we preserve backwards compatibility.
+            for (let i = 0; i < data.length; i++) {
+                if (data[i]["atp_count"]) {
+                    let new_atp_count = 0
+                    Object.keys(data[i]["atp_splits"]).forEach(function (country) {
+                        let country_max = 0
+                        Object.keys(data[i]["atp_splits"][country]).forEach(function (spider) {
+                            let count = data[i]["atp_splits"][country][spider]
+                            if (count > country_max) {
+                                country_max = count
+                            }
+                        })
+                        new_atp_count += country_max
+                    })
+                    data[i]["atp_count"] = new_atp_count
+                }
+            }
+        }
+        // Old insights.json had attributes "nsi_brand" and "nsi_description".
+        // These were misnamed and should in fact be references to Wikidata values.
+        // Fix these, leaving an "nsi_brand" field which will be incorrect but
+        // will be good in later insights.json.
+        if ("nsi_description" in data[0]) {
+            for (let i = 0; i < data.length; i++) {
+                data[i]["q_title"] = data[i]["nsi_brand"]
+                data[i]["q_description"] = data[i]["nsi_description"]
             }
         }
         dataTable.rows.add(insightsJson["data"])
@@ -85,12 +119,12 @@
         dom: 'l<"insight-files">frtip',
         order: [[1, 'desc']],
         columnDefs: [
-            { className: 'dt-center', targets: [0,5,6] },
+            { className: 'dt-center', targets: [0,5,6,7] },
             { className: 'dt-right', targets: [1,2,3,4] },
         ],
         columns: [
             {
-                "title": "Wikidata",
+                "title": "Q-code",
                 "data": "code",
                 "render": function (data, type, row, meta) {
                     if (type === 'display' && data.startsWith("Q")) {
@@ -101,7 +135,19 @@
             },
             {"title": "OSM count", "data": "osm_count"},
             {"title": "ATP count", "data": "atp_count"},
-            {"title": "Countries", "data": "atp_country_count"},
+            {
+                "title": "Countries",
+                "data": "atp_country_count",
+                "render": function (data, type, row, meta) {
+                    if (type === 'display' && row["atp_country_count"]) {
+                        let dataUrl = URL.createObjectURL(
+                            new Blob([JSON.stringify(row["atp_splits"], null, 6)], { type: "application/json" })
+                        );
+                        data = "<a target='_blank' href='"+dataUrl+"'>" + data + "</a>";
+                    }
+                    return data;
+                }
+            },
             {"title": "Spiders", "data": "atp_supplier_count"},
             {"title": "ATP brand", "data": "atp_brand"},
             {
@@ -109,12 +155,22 @@
                 "data": "nsi_brand",
                 "render": function (data, type, row, meta) {
                     if (type === 'display' && data) {
-                        data = '<a href="https://nsi.guide/index.html?t=brands&tt=' + data + '">' + data + '</a>';
+                        data = '<a href="https://nsi.guide/index.html?t=brands&tt=' + row["code"] + '">' + data + '</a>';
                     }
                     return data;
                 }
             },
-            {"title": "NSI description", "data": "nsi_description"},
+            {"title": "Q-title", "data": "q_title"},
+            {
+                "title": "Q-description",
+                "data": "q_description",
+                "render": function (data, type, row, meta) {
+                    if (type === 'display') {
+                        data = '<a href="https://www.wikidata.org/wiki/' + row["code"] + '">' + data + '</a>';
+                    }
+                    return data;
+                }
+            },
         ],
         "footerCallback": function (row, data, start, end, display) {
             let api = this.api()
