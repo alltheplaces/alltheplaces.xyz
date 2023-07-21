@@ -31,32 +31,50 @@
       "source-layer": "alltheplaces",
       "paint": {
         "circle-radius": [
-          "interpolate",
+          "let",
+          "radius",
           [
-            "exponential",
-            2
-          ],
-          [
-            "zoom"
-          ],
-          0,
-          2,
-          10,
-          ["*",
+            "*",
             6,
             [
-              "number",
+              "^",
               [
-                "get",
-                "sqrt_point_count"
+                "number",
+                [
+                  "get",
+                  "point_count"
+                ],
+                1
               ],
-              1
+              0.25
             ]
           ],
-          14,
-          10,
-          22,
-          50
+          [
+            "interpolate",
+            [
+              "exponential",
+              2
+            ],
+            [
+              "zoom"
+            ],
+            0,
+            10,
+            6,
+            [
+              "var",
+              "radius"
+            ],
+            10,
+            [
+              "var",
+              "radius"
+            ],
+            14,
+            10,
+            22,
+            50
+          ]
         ],
         "circle-color": [
           "case",
@@ -79,6 +97,14 @@
       "source": "alltheplaces",
       "source-layer": "alltheplaces",
       "minzoom": 11,
+      "filter": [
+        "!=",
+        [
+          "get",
+          "clustered"
+        ],
+        true
+      ],
       "layout": {
         "text-field": [
           "get",
@@ -87,7 +113,46 @@
         "text-font": [
           "Metropolis Regular"
         ],
-        "text-size": 10
+        "text-size": 10,
+        "text-padding": [
+          "interpolate",
+          [
+            "exponential",
+            2
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          8,
+          18,
+          0
+        ],
+        "text-justify": "auto",
+        "text-variable-anchor": [
+          "top-left",
+          "center",
+          "bottom-right"
+        ],
+        "text-radial-offset": [
+          "interpolate",
+          [
+            "exponential",
+            2
+          ],
+          [
+            "zoom"
+          ],
+          11,
+          0,
+          18,
+          1.5
+        ]
+      },
+      "paint": {
+        "text-halo-color": "#ffffee",
+        "text-halo-width": 1.25,
+        "text-halo-blur": 0.1
       }
     }
   ]
