@@ -88,7 +88,7 @@ function renderFeature(feature) {
         const u = new URL(
           "https://github.com/alltheplaces/alltheplaces/search"
         );
-        u.searchParams.set("q", `path:locations/spiders "name ${v}"`);
+        u.searchParams.set("q", `path:locations/spiders /name = "${v}"/`);
         a.href = u;
         a.textContent = v;
         return a;
