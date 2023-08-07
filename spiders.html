@@ -170,7 +170,7 @@
     let linkFormat = "geojson";
     function onLinkFormatChange() {
         linkFormat = document.getElementById('format-select').value
-        dataTable.draw()
+        dataTable.draw("page")
     }
 
     // Render with datatable
