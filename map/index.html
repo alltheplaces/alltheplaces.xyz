@@ -13,15 +13,23 @@
   .places-popup pre { white-space: pre-wrap; }
 </style>
 
+<link rel=preload as=fetch href=style.json>
+<link rel=preload as=fetch crossorigin href="https://data.alltheplaces.xyz/runs/latest.json">
+
 <script
-  src="https://unpkg.com/maplibre-gl@2.1.7/dist/maplibre-gl.js"
-  crossorigin integrity="sha512-gbL8519AKjxUDt2MQkH9X43fFWl34kv6uXVBJVj/0+QbIAOBDBCN8R3Z5GBgGuFoU3JH+t8btwF7gPK2/Y2Hvw=="
+  src="https://unpkg.com/pmtiles@2.5.0/dist/index.js"
+  crossorigin integrity="sha512-O+12zmlTuWHTS3mMDjtPe02T/kX8XqRiI7k9i1BjsmuWyOjHfjQrlkLSwTRR+4Jg6LFMpLPk77rgnYRtscxjkw=="
+></script>
+
+<script
+  src="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.js"
+  crossorigin integrity="sha512-EzLsfPILfpJ/KP9ikfoPFBIoRaJryjaHHB4YHXAU9nfiQIttgk4F/FWsNht+2bBq7A+7Se9LbU0OZgJNVFmlOQ=="
 ></script>
 
 <link
-  href="https://unpkg.com/maplibre-gl@2.1.7/dist/maplibre-gl.css"
+  href="https://unpkg.com/maplibre-gl@3.3.1/dist/maplibre-gl.css"
   rel="stylesheet"
-  crossorigin integrity="sha512-3rG/XrR5du72D9zrz70tH4kRl8DBGWt9TabqBPxncxZxw87kn07qz86wkDd23cvuqSUiXw+larY8C4GO5wjrIw=="
+  crossorigin integrity="sha512-zFG1SdFAVbwb/egjQlLXkpfrFbSkzpt526xWJ41fIbY7/qpBk+WF+Wj/fA2If4AnMD3ukCjqaq1i+l1DelWUbA=="
 />
 
 <script type="module" src="viewer.js"></script>

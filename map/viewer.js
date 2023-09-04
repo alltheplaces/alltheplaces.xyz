@@ -1,10 +1,18 @@
+const protocol = new pmtiles.Protocol();
+maplibregl.addProtocol("pmtiles", protocol.tile);
+
+const { pmtiles_url } = await fetch("https://data.alltheplaces.xyz/runs/latest.json").then(r => r.json());
+const style = await fetch("./style.json").then(r => r.json());
+style.sources.alltheplaces.url = `pmtiles://${pmtiles_url}`;
+
 export const map = (window.map = new maplibregl.Map({
   container: "map",
-  style: "./style.json",
+  style,
   center: [0, 0],
   zoom: 1,
   hash: true,
 }));
+
 map.addControl(new maplibregl.ScaleControl());
 map.dragRotate.disable();
 map.touchZoomRotate.disableRotation();
