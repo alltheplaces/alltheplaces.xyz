@@ -1,7 +1,7 @@
 const protocol = new pmtiles.Protocol();
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
-const { pmtiles_url } = await fetch("https://data.alltheplaces.xyz/runs/latest.json").then(r => r.json());
+const { pmtiles_url } = await fetch("https://alltheplaces-data.openaddresses.io/runs/latest.json").then(r => r.json());
 const style = await fetch("./style.json").then(r => r.json());
 style.sources.alltheplaces.url = `pmtiles://${pmtiles_url}`;
 

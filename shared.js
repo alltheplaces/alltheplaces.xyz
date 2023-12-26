@@ -5,7 +5,7 @@ async function fetchHistoryList() {
     let my_histories = [
         {
             "name": "ATP",
-            "url": "https://data.alltheplaces.xyz/runs/history.json",
+            "url": "https://alltheplaces-data.openaddresses.io/runs/history.json",
         },
     ]
     try {
