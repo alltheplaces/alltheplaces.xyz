@@ -1,5 +1,5 @@
 # alltheplaces.xyz
-The website for All The Places.
+The website for All The Places. Site is live on https://www.alltheplaces.xyz/
 
 This repository contains static resources only.
 
