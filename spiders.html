@@ -186,7 +186,7 @@
             [10, 15, 20, 25, 50, 75, 100, -1],
             [10, 15, 20, 25, 50, 75, 100, "All"],
         ],
-        pageLength: 10,
+        pageLength: parseFloat(URL_QUERY_PARAMS['page_length']) || 10,
         dom: 'l<"selector-div">frtip',
         order: [[2, 'desc']],
         search: { search: URL_QUERY_PARAMS?.search || '' },
