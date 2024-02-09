@@ -96,6 +96,7 @@
     }
 
     let NUM_BUILDS = 5; // Maximum number of builds to display.
+    const URL_QUERY_PARAMS = getUrlQueryParams();
 
     function calculateStability(row) {
         // Normalise the POI count data such that each run outputs the same maximum number.
@@ -188,6 +189,7 @@
         pageLength: 10,
         dom: 'l<"selector-div">frtip',
         order: [[2, 'desc']],
+        search: { search: URL_QUERY_PARAMS?.search || '' },
         columns: [
             {
                 title: "Spider",
