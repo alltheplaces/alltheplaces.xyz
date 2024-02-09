@@ -95,6 +95,11 @@
         return "rgb(" + red + "," + green + ",0)";
     }
 
+    const LINK_FORMAT_OPTIONS = [
+        ['geojson', 'Feature GeoJSON'],
+        ['statistics', 'Spider stats JSON'],
+        ['logs', 'Spider error logs'],
+    ];
     let NUM_BUILDS = 5; // Maximum number of builds to display.
     const URL_QUERY_PARAMS = getUrlQueryParams();
 
@@ -173,7 +178,8 @@
     });
 
     // Default link format is Featire GeoJSON, the selector in the table header can change this.
-    let linkFormat = "geojson";
+    let linkFormat = LINK_FORMAT_OPTIONS[parseFloat(URL_QUERY_PARAMS?.['link_format']) - 1]?.[0];
+    linkFormat ||= "geojson";
     function onLinkFormatChange() {
         linkFormat = document.getElementById('format-select').value
         dataTable.draw("page")
@@ -267,8 +273,10 @@
         },
     });
 
-    $('div.selector-div').html('<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table"><option value="geojson">Feature GeoJSON</option><option value="statistics">Spider stats JSON</option><option value="logs">Spider error logs</option></select></label>');
-    document.getElementById('format-select').onchange = onLinkFormatChange
+    const linkFormatOptionsHtml = LINK_FORMAT_OPTIONS.map(([val, label], i) => `<option value="${val}">${label}</option>`).join('');
+    $('div.selector-div').html(`<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`);
+    document.getElementById('format-select').value = linkFormat;
+    document.getElementById('format-select').onchange = onLinkFormatChange;
 
     </script>
 </body>
