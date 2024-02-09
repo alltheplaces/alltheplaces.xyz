@@ -40,7 +40,7 @@
             background-color: grey;
             position: relative;
             right: 0;
-            margin: auto; 
+            margin: auto;
         }
 
         .selector-label {
@@ -100,6 +100,7 @@
         ['statistics', 'Spider stats JSON'],
         ['logs', 'Spider error logs'],
     ];
+    const GITHUB_URL = "https://github.com/alltheplaces/alltheplaces/tree/master";
     let NUM_BUILDS = 5; // Maximum number of builds to display.
     const URL_QUERY_PARAMS = getUrlQueryParams();
 
@@ -145,14 +146,14 @@
     const statsList = await Promise.all(historyList.map(fetchStatsForHistoryListEntry))
 
     // Re-pivot the build data by spider.
-    let buildsBySpider = {};
+    const spiderToFilename = {};
+    const buildsBySpider = {};
     statsList.forEach(statsRun => {
         let runName = statsRun["name"]
         statsRun.results.forEach(spiderEntry => {
-            let spiderName = spiderEntry["spider"]
-            if (!buildsBySpider[spiderName]) {
-                buildsBySpider[spiderName] = {}
-            }
+            let spiderName = spiderEntry["spider"];
+            spiderToFilename[spiderName] = spiderEntry["filename"];
+            buildsBySpider[spiderName] ||= {}
             buildsBySpider[spiderName][runName] = {
                 errors: spiderEntry["errors"],
                 features: spiderEntry["features"],
@@ -199,6 +200,11 @@
         columns: [
             {
                 title: "Spider",
+                createdCell(cell) {
+                    if (URL_QUERY_PARAMS?.['link_to_source_code'] === 'true') {
+                        $(cell).html(`${cell.innerText}<a href="${GITHUB_URL}/${spiderToFilename[cell.innerText]}">✎</a>`);
+                    }
+                }
             },
             {
                 title: "Stability",
