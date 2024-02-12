@@ -203,9 +203,7 @@
             {
                 title: "Spider",
                 createdCell(cell) {
-                    if (URL_QUERY_PARAMS['link_to_source_code'] === 'true') {
-                        $(cell).html(`${cell.innerText}<a href="${GITHUB_URL}/${spiderToFilename[cell.innerText]}">✎</a>`);
-                    }
+                    $(cell).html(`${cell.innerText}<a href="${GITHUB_URL}/${spiderToFilename[cell.innerText]}">✎</a>`);
                 }
             },
             {
