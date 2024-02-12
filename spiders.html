@@ -179,7 +179,9 @@
     });
 
     // Default link format is Featire GeoJSON, the selector in the table header can change this.
-    let linkFormat = LINK_FORMAT_OPTIONS[parseFloat(URL_QUERY_PARAMS?.['link_format']) - 1]?.[0];
+    let linkFormat = Number.isFinite(parseFloat(URL_QUERY_PARAMS['link_format']))
+        ? LINK_FORMAT_OPTIONS[parseFloat(URL_QUERY_PARAMS['link_format']) - 1]?.[0]
+        : URL_QUERY_PARAMS['link_format']?.trim();
     linkFormat ||= "geojson";
     function onLinkFormatChange() {
         linkFormat = document.getElementById('format-select').value
