@@ -198,12 +198,12 @@
         pageLength: parseFloat(URL_QUERY_PARAMS['page_length']) || 10,
         dom: 'l<"selector-div">frtip',
         order: [[2, 'desc']],
-        search: { search: URL_QUERY_PARAMS?.search || '' },
+        search: { search: URL_QUERY_PARAMS['search'] || '' },
         columns: [
             {
                 title: "Spider",
                 createdCell(cell) {
-                    if (URL_QUERY_PARAMS?.['link_to_source_code'] === 'true') {
+                    if (URL_QUERY_PARAMS['link_to_source_code'] === 'true') {
                         $(cell).html(`${cell.innerText}<a href="${GITHUB_URL}/${spiderToFilename[cell.innerText]}">✎</a>`);
                     }
                 }
