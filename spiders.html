@@ -40,7 +40,7 @@
             background-color: grey;
             position: relative;
             right: 0;
-            margin: auto; 
+            margin: auto;
         }
 
         .selector-label {
@@ -95,7 +95,14 @@
         return "rgb(" + red + "," + green + ",0)";
     }
 
+    const LINK_FORMAT_OPTIONS = [
+        ['geojson', 'Feature GeoJSON'],
+        ['statistics', 'Spider stats JSON'],
+        ['logs', 'Spider error logs'],
+    ];
+    const GITHUB_URL = "https://github.com/alltheplaces/alltheplaces/tree/master";
     let NUM_BUILDS = 5; // Maximum number of builds to display.
+    const URL_QUERY_PARAMS = getUrlQueryParams();
 
     function calculateStability(row) {
         // Normalise the POI count data such that each run outputs the same maximum number.
@@ -139,14 +146,14 @@
     const statsList = await Promise.all(historyList.map(fetchStatsForHistoryListEntry))
 
     // Re-pivot the build data by spider.
-    let buildsBySpider = {};
+    const spiderToFilename = {};
+    const buildsBySpider = {};
     statsList.forEach(statsRun => {
         let runName = statsRun["name"]
         statsRun.results.forEach(spiderEntry => {
-            let spiderName = spiderEntry["spider"]
-            if (!buildsBySpider[spiderName]) {
-                buildsBySpider[spiderName] = {}
-            }
+            let spiderName = spiderEntry["spider"];
+            spiderToFilename[spiderName] = spiderEntry["filename"];
+            buildsBySpider[spiderName] ||= {}
             buildsBySpider[spiderName][runName] = {
                 errors: spiderEntry["errors"],
                 features: spiderEntry["features"],
@@ -172,7 +179,10 @@
     });
 
     // Default link format is Featire GeoJSON, the selector in the table header can change this.
-    let linkFormat = "geojson";
+    let linkFormat = Number.isFinite(parseFloat(URL_QUERY_PARAMS['link_format']))
+        ? LINK_FORMAT_OPTIONS[parseFloat(URL_QUERY_PARAMS['link_format']) - 1]?.[0]
+        : URL_QUERY_PARAMS['link_format']?.trim();
+    linkFormat ||= "geojson";
     function onLinkFormatChange() {
         linkFormat = document.getElementById('format-select').value
         dataTable.draw("page")
@@ -185,12 +195,16 @@
             [10, 15, 20, 25, 50, 75, 100, -1],
             [10, 15, 20, 25, 50, 75, 100, "All"],
         ],
-        pageLength: 10,
+        pageLength: parseFloat(URL_QUERY_PARAMS['page_length']) || 10,
         dom: 'l<"selector-div">frtip',
         order: [[2, 'desc']],
+        search: { search: URL_QUERY_PARAMS['search'] || '' },
         columns: [
             {
                 title: "Spider",
+                createdCell(cell) {
+                    $(cell).html(`${cell.innerText}<a target="_blank" href="${GITHUB_URL}/${spiderToFilename[cell.innerText]}">✎</a>`);
+                }
             },
             {
                 title: "Stability",
@@ -265,8 +279,10 @@
         },
     });
 
-    $('div.selector-div').html('<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table"><option value="geojson">Feature GeoJSON</option><option value="statistics">Spider stats JSON</option><option value="logs">Spider error logs</option></select></label>');
-    document.getElementById('format-select').onchange = onLinkFormatChange
+    const linkFormatOptionsHtml = LINK_FORMAT_OPTIONS.map(([val, label], i) => `<option value="${val}">${label}</option>`).join('');
+    $('div.selector-div').html(`<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`);
+    document.getElementById('format-select').value = linkFormat;
+    document.getElementById('format-select').onchange = onLinkFormatChange;
 
     </script>
 </body>

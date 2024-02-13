@@ -1,5 +1,6 @@
-
-// Return a list of history entries, sorted by most recent first.
+/**
+ * Return a list of history entries, sorted by most recent first.
+ */
 async function fetchHistoryList() {
     // The default configuration is the direct ATP history.json
     let my_histories = [
@@ -54,4 +55,17 @@ async function fetchHistoryList() {
     // Sort into most recent first order.
     history_runs.sort((a, b) => (a["run_id"] < b["run_id"]) ? 1 : ((b["run_id"] < a["run_id"]) ? -1 : 0))
     return history_runs
+}
+
+/**
+ * Gets URL query parameters and loads values into corresponding form fields.
+ */
+function getUrlQueryParams() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        return Object.fromEntries(urlParams.entries());
+    } catch (error) {
+        console.error(error);
+        return {};
+    }
 }
