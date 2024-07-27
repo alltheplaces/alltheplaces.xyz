@@ -260,7 +260,9 @@
                 if (data[i] || data[i] === 0) {
                     let linkUrl = null
                     if ((linkFormat === "map") && historyList[i - 2]["output_url"]) {
-                        linkUrl = new URL("https://alltheplaces-data.openaddresses.io/map.html?show=" + historyList[i - 2]["output_url"]).toString()
+                        let mapUrl = new URL("https://alltheplaces-data.openaddresses.io/map.html");
+                        mapUrl.searchParams.set("show", new URL("output/" + data[0] + ".geojson", historyList[i - 2]["output_url"]).toString());
+                        linkUrl = mapUrl.toString();
                     }
                     else if ((linkFormat === "geojson") && historyList[i - 2]["output_url"]) {
                         linkUrl = new URL("output/" + data[0] + ".geojson", historyList[i - 2]["output_url"]).toString()
