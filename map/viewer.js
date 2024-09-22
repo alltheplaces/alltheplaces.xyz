@@ -1,5 +1,5 @@
 import * as pmtiles from "https://unpkg.com/pmtiles@3.2.0/dist/index.js";
-const protocol = new pmtiles.Protocol({ attribution: true });
+const protocol = new pmtiles.Protocol({ metadata: true });
 maplibregl.addProtocol("pmtiles", protocol.tile);
 
 const { pmtiles_url } = await fetch("https://data.alltheplaces.xyz/runs/latest.json").then(r => r.json());
