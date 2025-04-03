@@ -6,7 +6,9 @@
     "build:map": "esbuild src/map.js --bundle --minify --outfile=assets/js/map.min.js",
     "build:builds:css": "esbuild css/builds.css --bundle --minify --outfile=assets/css/builds.min.css",
     "build:builds": "esbuild src/builds.js --bundle --minify --outfile=assets/js/builds.min.js",
-    "build": "npm run build:map && npm run build:builds:css && npm run build:builds"
+    "build:spiders": "esbuild src/spiders.js --bundle --minify --outfile=assets/js/spiders.min.js",
+    "build:spiders:css": "esbuild css/spiders.css --bundle --minify --outfile=assets/css/spiders.min.css",
+    "build": "npm run build:map && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders"
   },
   "dependencies": {
     "maplibre-gl": "^5.3.0",

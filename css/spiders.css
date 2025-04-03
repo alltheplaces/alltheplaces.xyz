@@ -1,0 +1,45 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "datatables.net-dt/css/jquery.dataTables.min.css";
+
+body {
+    font-size: 12px;
+    padding: 10px 100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+@media (max-width: 960px) {
+    body { padding: 10px 30px }
+    /* 820 = 960 - (100-30) * 2 */
+    @media (min-width: 820px) {
+        body { width: 820px }
+    }
+}
+
+[data-value="0"] {
+    color: red;
+    background-color: pink;
+}
+
+.stability-header {
+    text-align: center !important;
+}
+
+.stability-box {
+    width: 10px;
+    height: 10px;
+    border-radius: 10px;
+    background-color: grey;
+    position: relative;
+    right: 0;
+    margin: auto;
+}
+
+.selector-label {
+    margin-left: 20px;
+}
+.selector-label>select {
+    height: 25px;
+}
+.selector-div {
+    display: inline-block;
+}

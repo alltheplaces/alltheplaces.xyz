@@ -1,4 +1,4 @@
-import {fetchHistoryList, getUrlQueryParams} from './shared.js';
+import {fetchHistoryList} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
