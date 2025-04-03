@@ -43,17 +43,6 @@ jobs:
           cp node_modules/maplibre-gl/dist/maplibre-gl.css assets/css/
           cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css assets/css/
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.1'
-          bundler-cache: true
-
-      - name: Build with Jekyll
-        run: bundle exec jekyll build
-        env:
-          JEKYLL_ENV: production
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -69,7 +58,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3
 
   deploy-preview:
     if: github.event_name == 'pull_request'
@@ -81,7 +70,7 @@ jobs:
     steps:
       - name: Deploy PR Preview
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v3
 
       - name: Comment PR with Preview URL
         uses: actions/github-script@v6
