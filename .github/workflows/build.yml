@@ -39,13 +39,19 @@ jobs:
 
       - name: Copy To _site
         run: |
+          # CSS
           mkdir -p _site/assets/css
           cp css/style.css _site/assets/css/style.css
           cp assets/css/builds.min.css _site/assets/css/builds.min.css
-          cp assets/js/builds.min.js _site/assets/js/builds.min.js
+
+          # JS
           mkdir -p _site/assets/js
+          cp assets/js/builds.min.js _site/assets/js/builds.min.js
+          cp assets/js/map.min.js _site/assets/js/map.min.js
           cp node_modules/maplibre-gl/dist/maplibre-gl.css _site/assets/css
           cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css _site/assets/css
+
+          # HTML
           cp index.html _site/index.html
           cp spiders.html _site/spiders.html
           cp builds.html _site/builds.html
@@ -53,7 +59,6 @@ jobs:
           cp -R map/ _site/map
           cp -R images/ _site/assets/images
           cp -R fonts/ _site/assets/fonts
-          cp assets/js/map.min.js _site/assets/js/map.min.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
