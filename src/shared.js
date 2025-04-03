@@ -1,7 +1,7 @@
 /**
  * Return a list of history entries, sorted by most recent first.
  */
-async function fetchHistoryList() {
+export async function fetchHistoryList() {
     // The default configuration is the direct ATP history.json
     let my_histories = [
         {
@@ -60,7 +60,7 @@ async function fetchHistoryList() {
 /**
  * Gets URL query parameters and loads values into corresponding form fields.
  */
-function getUrlQueryParams() {
+export function getUrlQueryParams() {
     try {
         const urlParams = new URLSearchParams(window.location.search);
         return Object.fromEntries(urlParams.entries());
