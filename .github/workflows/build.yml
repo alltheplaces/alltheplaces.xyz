@@ -37,11 +37,17 @@ jobs:
       - name: Build JavaScript bundle
         run: npm run build
 
-      - name: Copy CSS files
+      - name: Copy To _site
         run: |
-          mkdir -p assets/css
-          cp node_modules/maplibre-gl/dist/maplibre-gl.css assets/css/
-          cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css assets/css/
+          mkdir -p _site/assets/css
+          cp node_modules/maplibre-gl/dist/maplibre-gl.css _site/assets/css
+          cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css _site/assets/css
+          cp index.html _site/index.html
+          cp spiders.html _site/spiders.html
+          cp builds.html _site/builds.html
+          cp wikidata.html _site/wikidata.html
+          cp -R map/ _site/map
+          cp -R images/ _site/images
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
