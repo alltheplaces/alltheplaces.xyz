@@ -20,7 +20,7 @@
     "@maplibre/maplibre-gl-geocoder": "^1.8.0",
     "pmtiles": "^4.3.0",
     "jquery": "^3.7.1",
-    "bootstrap": "^4.6.2",
+    "bootstrap": "^5.0.0",
     "datatables.net-dt": "^1.13.4",
     "datatables.net-fixedcolumns": "^5.0.4"
   },
