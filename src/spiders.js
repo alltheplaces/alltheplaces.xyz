@@ -1,4 +1,6 @@
 import {fetchHistoryList, getUrlQueryParams} from './shared.js';
+import $ from "jquery";
+import DataTable from 'datatables.net-dt';
 
 function getColorGradient(percentage) {
     if (percentage > 98) {
