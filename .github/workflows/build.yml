@@ -51,7 +51,7 @@ jobs:
           cp -R map/ _site/map
           cp -R images/ _site/assets/images
           cp -R fonts/ _site/assets/fonts
-          cp assets/js/bundle.min.js _site/assets/js/bundle.min.js
+          cp assets/js/map.min.js _site/assets/js/map.min.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

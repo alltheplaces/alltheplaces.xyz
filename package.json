@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --outfile=assets/js/bundle.min.js",
-    "dev": "esbuild src/main.js --bundle --watch --outfile=assets/js/bundle.min.js"
+    "build": "esbuild src/map.js --bundle --minify --outfile=assets/js/map.min.js"
   },
   "devDependencies": {
     "esbuild": "^0.25.2",
