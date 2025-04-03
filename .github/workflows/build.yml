@@ -59,7 +59,9 @@ jobs:
           cp spiders.html _site/spiders.html
           cp builds.html _site/builds.html
           cp wikidata.html _site/wikidata.html
-          cp -R map/ _site/map
+          cp map.html _site/map.html
+
+          # Other assets
           cp -R images/ _site/assets/images
           cp -R fonts/ _site/assets/fonts
 

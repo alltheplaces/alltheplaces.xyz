@@ -1,18 +1,18 @@
 import maplibregl from 'maplibre-gl';
 import MaplibreGeocoder from '@maplibre/maplibre-gl-geocoder';
 import * as pmtiles from 'pmtiles';
+import style_json from './style.json';
 
 (async function () {
     const protocol = new pmtiles.Protocol({metadata: true});
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
     const {pmtiles_url} = await fetch("https://data.alltheplaces.xyz/runs/latest.json").then(r => r.json());
-    const style = await fetch("./style.json").then(r => r.json());
-    style.sources.alltheplaces.url = `pmtiles://${pmtiles_url}`;
+    style_json.sources.alltheplaces.url = `pmtiles://${pmtiles_url}`;
 
     const map = (window.map = new maplibregl.Map({
         container: "map",
-        style,
+        style: style_json,
         center: [0, 0],
         zoom: 1,
         hash: true,

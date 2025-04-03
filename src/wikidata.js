@@ -110,7 +110,7 @@ function isInt(value) {
                 "data": "nsi_brand",
                 "render": function (data, type, row, meta) {
                     if (type === 'display' && data) {
-                        data = '<a href="https://nsi.guide/index.html?t=brands&tt=' + row["code"] + '">' + data + '</a>';
+                        data = '<a href="https://nsi.guide/map.html?t=brands&tt=' + row["code"] + '">' + data + '</a>';
                     }
                     return data;
                 }
