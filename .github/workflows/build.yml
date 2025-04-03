@@ -50,6 +50,7 @@ jobs:
           cp wikidata.html _site/wikidata.html
           cp -R map/ _site/map
           cp -R images/ _site/assets/images
+          cp -R fonts/ _site/assets/fonts
           cp assets/js/bundle.min.js _site/assets/js/bundle.min.js
 
       - name: Upload artifact
