@@ -6,7 +6,7 @@
     const style = await fetch("./style.json").then(r => r.json());
     style.sources.alltheplaces.url = `pmtiles://${pmtiles_url}`;
 
-    export const map = (window.map = new maplibregl.Map({
+    const map = (window.map = new maplibregl.Map({
         container: "map",
         style,
         center: [0, 0],
