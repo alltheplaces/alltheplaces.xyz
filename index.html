@@ -1,80 +1,89 @@
 <!doctype html>
 <html lang="en-US">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
 
-<!-- Begin Jekyll SEO tag v2.3.0 -->
-<title>All The Places | A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible.</title>
-<meta property="og:title" content="All The Places" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible." />
-<meta property="og:description" content="A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible." />
-<link rel="canonical" href="http://localhost:4000/" />
-<meta property="og:url" content="http://localhost:4000/" />
-<meta property="og:site_name" content="All The Places" />
-<script type="application/ld+json">
-{"name":"All The Places","description":"A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible.","author":null,"@type":"WebSite","url":"http://localhost:4000/","publisher":null,"image":null,"headline":"All The Places","dateModified":null,"datePublished":null,"sameAs":null,"mainEntityOfPage":null,"@context":"http://schema.org"}</script>
-<!-- End Jekyll SEO tag -->
+    <title>All The Places | A growing set of web scrapers designed to output consistent geodata about as many places of
+        business in the world as possible.</title>
+    <meta property="og:title" content="All The Places"/>
+    <meta property="og:locale" content="en_US"/>
+    <meta name="description"
+          content="A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible."/>
+    <meta property="og:description"
+          content="A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible."/>
+    <link rel="canonical" href="https://alltheplaces.xyz/"/>
+    <meta property="og:url" content="https://alltheplaces.xyz/"/>
+    <meta property="og:site_name" content="All The Places"/>
+    <script type="application/ld+json">
+        {
+            "name": "All The Places",
+            "description": "A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible.",
+            "author": null,
+            "@type": "WebSite",
+            "url": "https://alltheplaces.xyz/",
+            "publisher": null,
+            "image": null,
+            "headline": "All The Places",
+            "dateModified": null,
+            "datePublished": null,
+            "sameAs": null,
+            "mainEntityOfPage": null,
+            "@context": "http://schema.org"
+        }</script>
 
-
-    <link rel="stylesheet" href="/assets/css/style.css?v=2c3fa243bc78750b2ae0e15b69bdbc0efc7a5167">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <meta name="viewport" content="width=device-width">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
+</head>
+<body>
+<div class="wrapper">
+    <header>
         <h1>All The Places</h1>
-        <p>A growing set of web scrapers designed to output consistent geodata about as many places of business in the world as possible.
-</p>
+        <p>A growing set of web scrapers designed to output consistent geodata about as many places of business in the
+            world as possible.
+        </p>
 
-        
-          <p class="view"><a href="http://github.com/alltheplaces/alltheplaces">View the Project on GitHub <small></small></a></p>
-        
+        <p class="view"><a href="http://github.com/alltheplaces/alltheplaces">View the Project on GitHub <small></small></a>
+        </p>
+    </header>
+    <section>
+        <p><img src="/images/overview-map.png" alt="Map with points for a recent run of the scrapers"/></p>
 
-        
+        <h2 id="data-downloads">Data Downloads</h2>
 
-        
-      </header>
-      <section>
+        <p>Downloads of the results from all the scrapers:</p>
 
-      <p><img src="/images/overview-map.png" alt="Map with points for a recent run of the scrapers" /></p>
+        <iframe frameborder="no" border="0" width="400" height="100" scrolling="no"
+                src="https://data.alltheplaces.xyz/runs/latest/info_embed.html"></iframe>
 
-<h2 id="data-downloads">Data Downloads</h2>
+        <h2 id="format">Format</h2>
 
-<p>Downloads of the results from all the scrapers:</p>
+        <p>The linked file is a gzipped <a href="http://ndjson.org/">ndjson</a> where each line is a <a
+                href="https://tools.ietf.org/html/rfc7946#section-3.2">GeoJSON feature</a>.</p>
 
-<iframe frameborder="no" border="0" width="400" height="100" scrolling="no" src="https://s3.amazonaws.com/placescraper-results/runs/latest/info_embed.html"></iframe>
+        <p>Information about the properties contained in each GeoJSON feature are documented <a
+                href="https://github.com/alltheplaces/alltheplaces/blob/master/DATA_FORMAT.md">on the project’s GitHub
+            repository</a>.</p>
 
-<h2 id="format">Format</h2>
+        <h2 id="license">License</h2>
 
-<p>The linked file is a gzipped <a href="http://ndjson.org/">ndjson</a> where each line is a <a href="https://tools.ietf.org/html/rfc7946#section-3.2">GeoJSON feature</a>.</p>
+        <p><a href="https://creativecommons.org/publicdomain/zero/1.0/"><img
+                src="https://i.creativecommons.org/p/zero/1.0/88x31.png" alt="CC-0 Image Mark"/></a></p>
 
-<p>Information about the properties contained in each GeoJSON feature are documented <a href="https://github.com/alltheplaces/alltheplaces/blob/master/DATA_FORMAT.md">on the project’s GitHub repository</a>.</p>
+        <p>The downloads provided above and the data contained therein are released under <a
+                href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons’ CC-0 waiver</a>.</p>
 
-<h2 id="license">License</h2>
-
-<p><a href="https://creativecommons.org/publicdomain/zero/1.0/"><img src="https://i.creativecommons.org/p/zero/1.0/88x31.png" alt="CC-0 Image Mark" /></a></p>
-
-<p>The downloads provided above and the data contained therein are released under <a href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons’ CC-0 waiver</a>.</p>
-
-<p>The <a href="https://github.com/alltheplaces/alltheplaces">spider software</a> that produces this work is licensed under the <a href="https://github.com/alltheplaces/alltheplaces/blob/master/LICENSE">MIT license</a>.</p>
-
-
-      </section>
-      <footer>
-        
+        <p>The <a href="https://github.com/alltheplaces/alltheplaces">spider software</a> that produces this work is
+            licensed under the <a href="https://github.com/alltheplaces/alltheplaces/blob/master/LICENSE">MIT
+                license</a>.</p>
+    </section>
+    <footer>
         <p>This project is maintained by <a href="http://github.com/alltheplaces">alltheplaces</a></p>
-        
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="/assets/js/scale.fix.js"></script>
 
-
-  
-  </body>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a
+                href="https://github.com/orderedlist">orderedlist</a></small></p>
+    </footer>
+</div>
+<script src="/assets/js/scale.fix.js"></script>
+</body>
 </html>

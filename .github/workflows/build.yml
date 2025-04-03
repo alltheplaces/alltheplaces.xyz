@@ -40,6 +40,7 @@ jobs:
       - name: Copy To _site
         run: |
           mkdir -p _site/assets/css
+          cp css/style.css _site/assets/css/style.css
           mkdir -p _site/assets/js
           cp node_modules/maplibre-gl/dist/maplibre-gl.css _site/assets/css
           cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css _site/assets/css
