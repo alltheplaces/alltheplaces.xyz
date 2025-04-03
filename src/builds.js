@@ -1,4 +1,6 @@
 import {fetchHistoryList, getUrlQueryParams} from './shared.js';
+import $ from "jquery";
+import DataTable from 'datatables.net-dt';
 
 function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return '0 Bytes';
