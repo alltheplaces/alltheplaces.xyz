@@ -4,13 +4,14 @@
   "private": true,
   "scripts": {
     "build:map": "esbuild src/map.js --bundle --minify --outfile=assets/js/map.min.js",
+    "build:map:css": "esbuild css/map.css --bundle --minify --outfile=assets/css/map.min.css",
     "build:builds:css": "esbuild css/builds.css --bundle --minify --outfile=assets/css/builds.min.css",
     "build:builds": "esbuild src/builds.js --bundle --minify --outfile=assets/js/builds.min.js",
     "build:spiders": "esbuild src/spiders.js --bundle --minify --outfile=assets/js/spiders.min.js",
     "build:spiders:css": "esbuild css/spiders.css --bundle --minify --outfile=assets/css/spiders.min.css",
     "build:wikidata": "esbuild src/wikidata.js --bundle --minify --outfile=assets/js/wikidata.min.js",
     "build:wikidata:css": "esbuild css/wikidata.css --bundle --minify --outfile=assets/css/wikidata.min.css",
-    "build": "npm run build:map && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders && npm run build:wikidata:css && npm run build:wikidata"
+    "build": "npm run build:map && npm run build:map:css && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders && npm run build:wikidata:css && npm run build:wikidata"
   },
   "dependencies": {
     "maplibre-gl": "^5.3.0",

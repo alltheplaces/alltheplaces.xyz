@@ -45,15 +45,14 @@ jobs:
           cp assets/css/builds.min.css _site/assets/css/builds.min.css
           cp assets/css/spiders.min.css _site/assets/css/spiders.min.css
           cp assets/css/wikidata.min.css _site/assets/css/wikidata.min.css
+          cp assets/css/map.min.css _site/assets/css/map.min.css
 
           # JS
           mkdir -p _site/assets/js
           cp assets/js/builds.min.js _site/assets/js/builds.min.js
-          cp assets/js/map.min.js _site/assets/js/map.min.js
           cp assets/js/spiders.min.js _site/assets/js/spiders.min.js
           cp assets/js/wikidata.min.js _site/assets/js/wikidata.min.js
-          cp node_modules/maplibre-gl/dist/maplibre-gl.css _site/assets/css
-          cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css _site/assets/css
+          cp assets/js/map.min.js _site/assets/js/map.min.js
 
           # HTML
           cp index.html _site/index.html

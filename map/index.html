@@ -1,26 +1,19 @@
-<!doctype html>
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
 
-<title>All The Places | Map</title>
+    <link rel="stylesheet" type="text/css" href="/assets/css/map.min.css">
+    <link rel=preload as=fetch crossorigin href="style.json">
+    <link rel=preload as=fetch crossorigin href="https://data.alltheplaces.xyz/runs/latest.json">
 
-<style>
-    body { margin: 0; padding: 0; }
-    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-
-    .places-popup { max-height: 40vh; }
-    .places-popup > div { overflow: auto; }
-    .places-popup pre { white-space: pre-wrap; }
-</style>
-
-<link rel=preload as=fetch crossorigin href="style.json">
-<link rel=preload as=fetch crossorigin href="https://data.alltheplaces.xyz/runs/latest.json">
-
-<!-- MapLibre CSS -->
-<link rel="stylesheet" href="/assets/css/maplibre-gl.css">
-<link rel="stylesheet" href="/assets/css/maplibre-gl-geocoder.css">
+    <title>All The Places | Map</title>
+</head>
+<body>
+<div id="map"></div>
 
 <!-- Bundled JavaScript -->
 <script src="/assets/js/map.min.js" defer></script>
 
-<div id="map"></div>
+</body>
+</html>
