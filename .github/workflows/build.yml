@@ -46,6 +46,7 @@ jobs:
           cp assets/css/spiders.min.css _site/assets/css/spiders.min.css
           cp assets/css/wikidata.min.css _site/assets/css/wikidata.min.css
           cp assets/css/map.min.css _site/assets/css/map.min.css
+          cp assets/css/preview.min.css _site/assets/css/preview.min.css
 
           # JS
           mkdir -p _site/assets/js
@@ -53,6 +54,7 @@ jobs:
           cp assets/js/spiders.min.js _site/assets/js/spiders.min.js
           cp assets/js/wikidata.min.js _site/assets/js/wikidata.min.js
           cp assets/js/map.min.js _site/assets/js/map.min.js
+          cp assets/js/preview.min.js _site/assets/js/preview.min.js
 
           # HTML
           cp index.html _site/index.html
@@ -60,6 +62,7 @@ jobs:
           cp builds.html _site/builds.html
           cp wikidata.html _site/wikidata.html
           cp map.html _site/map.html
+          cp preview.html _site/preview.html
 
           # Other assets
           cp -R images/ _site/assets/images
