@@ -40,6 +40,7 @@ jobs:
       - name: Copy To _site
         run: |
           mkdir -p _site/assets/css
+          mkdir -p _site/assets/js
           cp node_modules/maplibre-gl/dist/maplibre-gl.css _site/assets/css
           cp node_modules/@maplibre/maplibre-gl-geocoder/dist/maplibre-gl-geocoder.css _site/assets/css
           cp index.html _site/index.html
@@ -48,6 +49,7 @@ jobs:
           cp wikidata.html _site/wikidata.html
           cp -R map/ _site/map
           cp -R images/ _site/images
+          cp assets/js/bundle.min.js _site/assets/js/bundle.min.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
