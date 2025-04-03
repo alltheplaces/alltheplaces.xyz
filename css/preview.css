@@ -1,0 +1,15 @@
+@import "maplibre-gl/dist/maplibre-gl.css";
+
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+    width: 100vw;
+}
+
+/* Make the maplibre popup table header have a right alignment */
+.maplibregl-popup-content table th {
+    text-align: right;
+}

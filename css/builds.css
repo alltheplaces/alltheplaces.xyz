@@ -1,0 +1,7 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "datatables.net-dt/css/jquery.dataTables.min.css";
+
+body {
+    font-size: 12px;
+    padding: 10px 100px;
+}

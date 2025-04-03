@@ -1,0 +1,16 @@
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "datatables.net-dt/css/jquery.dataTables.min.css";
+
+body {
+    font-size: 12px;
+    padding: 10px 100px;
+}
+.insight-label {
+    margin-left: 10px;
+}
+.insight-label>select {
+    height: 25px;
+}
+.insight-files {
+    display: inline-block;
+}

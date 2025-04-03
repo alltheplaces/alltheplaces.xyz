@@ -3,13 +3,28 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "build": "esbuild src/main.js --bundle --minify --outfile=assets/js/bundle.min.js",
-    "dev": "esbuild src/main.js --bundle --watch --outfile=assets/js/bundle.min.js"
+    "build:map": "esbuild src/map.js --bundle --minify --outfile=assets/js/map.min.js",
+    "build:map:css": "esbuild css/map.css --bundle --minify --outfile=assets/css/map.min.css",
+    "build:builds:css": "esbuild css/builds.css --bundle --minify --outfile=assets/css/builds.min.css",
+    "build:builds": "esbuild src/builds.js --bundle --minify --outfile=assets/js/builds.min.js",
+    "build:spiders": "esbuild src/spiders.js --bundle --minify --outfile=assets/js/spiders.min.js",
+    "build:spiders:css": "esbuild css/spiders.css --bundle --minify --outfile=assets/css/spiders.min.css",
+    "build:wikidata": "esbuild src/wikidata.js --bundle --minify --outfile=assets/js/wikidata.min.js",
+    "build:wikidata:css": "esbuild css/wikidata.css --bundle --minify --outfile=assets/css/wikidata.min.css",
+    "build:preview": "esbuild src/preview.js --bundle --minify --outfile=assets/js/preview.min.js",
+    "build:preview:css": "esbuild css/preview.css --bundle --minify --outfile=assets/css/preview.min.css",
+    "build": "npm run build:map && npm run build:map:css && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders && npm run build:wikidata:css && npm run build:wikidata && npm run build:preview:css && npm run build:preview"
+  },
+  "dependencies": {
+    "maplibre-gl": "^5.3.0",
+    "@maplibre/maplibre-gl-geocoder": "^1.8.0",
+    "pmtiles": "^4.3.0",
+    "jquery": "^3.7.1",
+    "bootstrap": "^4.6.2",
+    "datatables.net-dt": "^1.13.4",
+    "datatables.net-fixedcolumns": "^5.0.4"
   },
   "devDependencies": {
-    "esbuild": "^0.19.8",
-    "maplibre-gl": "^3.3.1",
-    "@maplibre/maplibre-gl-geocoder": "^1.5.0",
-    "pmtiles": "^3.2.0"
+    "esbuild": "^0.25.2"
   }
 }

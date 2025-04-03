@@ -4,17 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.1.0/css/fixedColumns.dataTables.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="/assets/css/builds.min.css">
 
     <title>ATP Builds</title>
-    <style>
-        body {
-            font-size: 12px;
-            padding: 10px 100px;
-        }
-    </style>
 </head>
 <body>
     <table id="spider-table" class="display" style="width:100%">
@@ -29,109 +21,6 @@
         </tfoot>
     </table>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.6/dist/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.2.1/dist/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.datatables.net/fixedcolumns/4.1.0/js/dataTables.fixedColumns.min.js" crossorigin="anonymous"></script>
-    <script src="./shared.js"></script>
-
-    <script type=module>
-
-    const data = await fetchHistoryList();
-
-    function formatBytes(bytes, decimals = 2) {
-        if (bytes === 0) return '0 Bytes';
-
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-    }
-
-    // Render with datatable
-    let dataTable = $("#spider-table").DataTable({
-        data,
-        lengthMenu: [
-            [10, 15, 20, 25, 50, 75, 100, -1],
-            [10, 15, 20, 25, 50, 75, 100, "All"],
-        ],
-        pageLength: 15,
-        order: [[0, 'desc']],
-        columns: [
-            {"title": "Run", "data": "name"},
-            {
-                "title": "Run statistics",
-                "data": "stats_url",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display') {
-                        if (data) {
-                            return '<a href="' + data + '">Summary</a>'
-                        }
-                        return ""
-                    }
-                    return data;
-                }
-            },
-            {
-                "title": "Spider count",
-                "data": "spiders",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display' && data) {
-                        data = data.toLocaleString("us-US")
-                    }
-                    return data;
-                }
-            },
-            {
-                "title": "Feature count",
-                "data": "total_lines",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display' && data) {
-                        data = data.toLocaleString("us-US")
-                    }
-                    return data;
-                }
-            },
-            {
-                "title": "Download features",
-                "data": "size_bytes",
-                "render": function (data, type, row, meta) {
-                    if (type === 'display') {
-                        if (data && (data > 0)) {
-                            let text = "Download " + formatBytes(data)
-                            return '<a href="' + row["output_url"] + '">' + text + '</a>'
-                        }
-                        return ""
-                    }
-                    return data;
-                }
-            },
-        ],
-        columnDefs: [
-            { className: 'dt-center', targets: [1,4] },
-            { className: 'dt-right', targets: [2,3] },
-        ],
-        "footerCallback": function (row, data, start, end, display) {
-            let api = this.api()
-            // Total up the numeric columns (all next to each)
-            let columns = [3]
-            for (let i in columns) {
-                let total = api
-                    .column(columns[i], {filter: "applied"})
-                    .data()
-                    .reduce(function (a, b) {
-                        return a + b;
-                    }, 0);
-                // Update total in footer
-                $(api.column(columns[i]).footer()).html(total.toLocaleString("us-US"));
-            }
-        },
-    });
-
-</script>
+    <script src="/assets/js/builds.min.js" defer></script>
 </body>
 </html>
