@@ -1,3 +1,7 @@
 _site
 .sass-cache
 .jekyll-metadata
+node_modules/
+assets/js/bundle.min.js
+assets/css/maplibre-gl.css
+assets/css/maplibre-gl-geocoder.css
