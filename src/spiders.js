@@ -120,7 +120,15 @@ async function fetchStatsForHistoryListEntry(entry) {
             [10, 15, 20, 25, 50, 75, 100, "All"],
         ],
         pageLength: parseFloat(URL_QUERY_PARAMS['page_length']) || 10,
-        dom: 'l<"selector-div">frtip',
+        layout: {
+            topStart: [
+                'pageLength',
+                { div: { className: 'selector-div' } },
+            ],
+            topEnd: 'search',
+            bottomStart: 'info',
+            bottomEnd: 'paging'
+        },
         order: [[2, 'desc']],
         search: {search: URL_QUERY_PARAMS['search'] || ''},
         columns: [
