@@ -1,5 +1,5 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
-@import "datatables.net-dt/css/jquery.dataTables.min.css";
+@import "datatables.net-dt/css/dataTables.dataTables.min.css";
 
 body {
     font-size: 12px;
@@ -42,4 +42,10 @@ body {
 }
 .selector-div {
     display: inline-block;
+}
+
+.dt-length label {
+    /* Bootstrap's _reboot interferes here. Perhaps use DataTables' Bootstrap
+       styling instead? */
+    display: inline;
 }
