@@ -71,7 +71,15 @@ function isInt(value) {
     let dataTable = $("#spider-table").DataTable({
         lengthMenu: [10, 15, 20, 25, 50, 75, 100],
         pageLength: 10,
-        dom: 'l<"insight-files">frtip',
+        layout: {
+            topStart: [
+                'pageLength',
+                { div: { className: 'insight-files' } },
+            ],
+            topEnd: 'search',
+            bottomStart: 'info',
+            bottomEnd: 'paging'
+        },
         order: [[1, 'desc']],
         columnDefs: [
             { className: 'dt-center', targets: [0,5,6,7] },
