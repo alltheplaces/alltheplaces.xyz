@@ -136,12 +136,21 @@ import style_json from './style.json';
                 const response = await fetch(request);
                 const geojson = await response.json();
                 for (const feature of geojson.features) {
-                    const center = [
-                        feature.bbox[0] +
-                        (feature.bbox[2] - feature.bbox[0]) / 2,
-                        feature.bbox[1] +
-                        (feature.bbox[3] - feature.bbox[1]) / 2
-                    ];
+                    let center;
+                    
+                    // If the geometry is already a Point, use its coordinates directly
+                    if (feature.geometry.type === 'Point') {
+                        center = feature.geometry.coordinates;
+                    } else {
+                        // For other geometries, calculate center from bbox
+                        center = [
+                            feature.bbox[0] +
+                            (feature.bbox[2] - feature.bbox[0]) / 2,
+                            feature.bbox[1] +
+                            (feature.bbox[3] - feature.bbox[1]) / 2
+                        ];
+                    }
+                    
                     const point = {
                         type: 'Feature',
                         geometry: {
@@ -149,10 +158,15 @@ import style_json from './style.json';
                             coordinates: center
                         },
                         place_name: feature.properties.display_name,
-                        properties: feature.properties,
+                        properties: {
+                            ...feature.properties,
+                            // Store the bounding box for potential map fitting
+                            bbox: feature.bbox
+                        },
                         text: feature.properties.display_name,
                         place_type: ['place'],
-                        center
+                        center,
+                        bbox: feature.bbox
                     };
                     features.push(point);
                 }
@@ -166,11 +180,50 @@ import style_json from './style.json';
         }
     };
 
-    map.addControl(
-        new MaplibreGeocoder(geocoderApi, {
-            maplibregl,
-        })
-    );
+    const geocoder = new MaplibreGeocoder(geocoderApi, {
+        maplibregl,
+    });
+    
+    map.addControl(geocoder);
+    
+    // Listen for when a geocoding result is selected
+    geocoder.on('result', (event) => {
+        const result = event.result;
+        
+        // If the result has a bounding box, fit the map to it
+        // This provides better context than just centering on a point
+        if (result.bbox && result.bbox.length === 4) {
+            const [minLng, minLat, maxLng, maxLat] = result.bbox;
+            
+            // Only fit to bounds if the bounding box is reasonable in size
+            // This prevents fitting to extremely large areas
+            const lngDiff = maxLng - minLng;
+            const latDiff = maxLat - minLat;
+            
+            // If the area is small enough, fit to bounds, otherwise just center
+            if (lngDiff < 10 && latDiff < 10) {
+                map.fitBounds([
+                    [minLng, minLat],
+                    [maxLng, maxLat]
+                ], {
+                    padding: 50,
+                    maxZoom: 15
+                });
+            } else {
+                // For very large areas, just center on the point
+                map.easeTo({
+                    center: result.center,
+                    zoom: 8
+                });
+            }
+        } else {
+            // Fallback to centering on the point
+            map.easeTo({
+                center: result.center,
+                zoom: 12
+            });
+        }
+    });
 })();
 
 import './scale.fix.js';
