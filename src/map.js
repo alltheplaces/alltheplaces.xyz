@@ -190,34 +190,20 @@ import style_json from './style.json';
     geocoder.on('result', (event) => {
         const result = event.result;
         
-        // If the result has a bounding box, fit the map to it
-        // This provides better context than just centering on a point
+        // Always focus on the bounding box that Nominatim provides
+        // This ensures we see the full extent of the searched location
         if (result.bbox && result.bbox.length === 4) {
             const [minLng, minLat, maxLng, maxLat] = result.bbox;
             
-            // Only fit to bounds if the bounding box is reasonable in size
-            // This prevents fitting to extremely large areas
-            const lngDiff = maxLng - minLng;
-            const latDiff = maxLat - minLat;
-            
-            // If the area is small enough, fit to bounds, otherwise just center
-            if (lngDiff < 10 && latDiff < 10) {
-                map.fitBounds([
-                    [minLng, minLat],
-                    [maxLng, maxLat]
-                ], {
-                    padding: 50,
-                    maxZoom: 15
-                });
-            } else {
-                // For very large areas, just center on the point
-                map.easeTo({
-                    center: result.center,
-                    zoom: 8
-                });
-            }
+            map.fitBounds([
+                [minLng, minLat],
+                [maxLng, maxLat]
+            ], {
+                padding: 50,
+                maxZoom: 15
+            });
         } else {
-            // Fallback to centering on the point
+            // Fallback to centering on the point only if no bounding box is available
             map.easeTo({
                 center: result.center,
                 zoom: 12
