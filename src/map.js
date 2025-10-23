@@ -73,13 +73,42 @@ import style_json from './style.json';
         props.sort((a, b) => a[0].localeCompare(b[0]));
         const formatValue = (k, v) => {
             switch (k) {
-                case "website": {
+                case "phone": {
+                    const a = document.createElement("a");
+                    a.href = `tel:${v}`;
+                    a.textContent = v;
+                    return a;
+                }
+                case "email": {
+                    const a = document.createElement("a");
+                    a.href = `mailto:${v}`;
+                    a.textContent = v;
+                    return a;
+                }
+                case "website":
+                case "image": {
                     const a = document.createElement("a");
                     a.target = "_blank";
                     a.href = a.textContent = v;
                     return a;
                 }
-                case "brand:wikidata": {
+                case "contact:twitter": {
+                    const a = document.createElement("a");
+                    a.target = "_blank";
+                    a.href = v.toLowerCase().startsWith("http") ? v : `https://x.com/${v}`;
+                    a.textContent = v;
+                    return a;
+                }
+                case "contact:facebook": {
+                    const a = document.createElement("a");
+                    a.target = "_blank";
+                    a.href = v.toLowerCase().startsWith("http") ? v : `https://www.facebook.com/${v}`;
+                    a.textContent = v;
+                    return a;
+                }
+                case "brand:wikidata":
+                case "operator:wikidata":
+                case "located_in:wikidata": {
                     const a = document.createElement("a");
                     a.target = "_blank";
                     a.href = `https://www.wikidata.org/wiki/${v}`;
