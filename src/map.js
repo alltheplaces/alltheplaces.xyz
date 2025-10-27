@@ -165,12 +165,21 @@ import style_json from './style.json';
                 const response = await fetch(request);
                 const geojson = await response.json();
                 for (const feature of geojson.features) {
-                    const center = [
-                        feature.bbox[0] +
-                        (feature.bbox[2] - feature.bbox[0]) / 2,
-                        feature.bbox[1] +
-                        (feature.bbox[3] - feature.bbox[1]) / 2
-                    ];
+                    let center;
+                    
+                    // If the geometry is already a Point, use its coordinates directly
+                    if (feature.geometry.type === 'Point') {
+                        center = feature.geometry.coordinates;
+                    } else {
+                        // For other geometries, calculate center from bbox
+                        center = [
+                            feature.bbox[0] +
+                            (feature.bbox[2] - feature.bbox[0]) / 2,
+                            feature.bbox[1] +
+                            (feature.bbox[3] - feature.bbox[1]) / 2
+                        ];
+                    }
+                    
                     const point = {
                         type: 'Feature',
                         geometry: {
@@ -178,10 +187,15 @@ import style_json from './style.json';
                             coordinates: center
                         },
                         place_name: feature.properties.display_name,
-                        properties: feature.properties,
+                        properties: {
+                            ...feature.properties,
+                            // Store the bounding box for potential map fitting
+                            bbox: feature.bbox
+                        },
                         text: feature.properties.display_name,
                         place_type: ['place'],
-                        center
+                        center,
+                        bbox: feature.bbox
                     };
                     features.push(point);
                 }
@@ -195,11 +209,36 @@ import style_json from './style.json';
         }
     };
 
-    map.addControl(
-        new MaplibreGeocoder(geocoderApi, {
-            maplibregl,
-        })
-    );
+    const geocoder = new MaplibreGeocoder(geocoderApi, {
+        maplibregl,
+    });
+    
+    map.addControl(geocoder);
+    
+    // Listen for when a geocoding result is selected
+    geocoder.on('result', (event) => {
+        const result = event.result;
+        
+        // Always focus on the bounding box that Nominatim provides
+        // This ensures we see the full extent of the searched location
+        if (result.bbox && result.bbox.length === 4) {
+            const [minLng, minLat, maxLng, maxLat] = result.bbox;
+            
+            map.fitBounds([
+                [minLng, minLat],
+                [maxLng, maxLat]
+            ], {
+                padding: 50,
+                maxZoom: 15
+            });
+        } else {
+            // Fallback to centering on the point only if no bounding box is available
+            map.easeTo({
+                center: result.center,
+                zoom: 12
+            });
+        }
+    });
 })();
 
 import './scale.fix.js';
