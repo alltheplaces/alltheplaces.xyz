@@ -49,3 +49,7 @@ body {
        styling instead? */
     display: inline;
 }
+
+.no-josm {
+	display: none;
+}

@@ -25,6 +25,16 @@ const LINK_FORMAT_OPTIONS = [
 ];
 const GITHUB_URL = "https://github.com/alltheplaces/alltheplaces/tree/master";
 let NUM_BUILDS = 5; // Maximum number of builds to display.
+let JOSM_AVAILABLE = false;
+
+fetch("http://127.0.0.1:8111/version")
+    .then(resp => resp.json())
+    .then((resp) => {
+        JOSM_AVAILABLE = true;
+    })
+    .catch((err) => {
+        JOSM_AVAILABLE = false;
+    });
 
 function calculateStability(row) {
     // Normalise the POI count data such that each run outputs the same maximum number.
@@ -205,7 +215,7 @@ async function fetchStatsForHistoryListEntry(entry) {
                     let linkData = data[i].toLocaleString("us-US")
 
                     if (linkUrl) {
-                        $('td:eq(' + i + ')', row).html('<a href ="' + linkUrl + '">' + linkData + '</a>');
+                        $('td:eq(' + i + ')', row).html('<a href ="' + linkUrl + '">' + linkData + '</a> <a href="http://127.0.0.1:8111/import?new_layer=true&download_policy=never&upload_policy=never&url=' + linkUrl + '" ' + (JOSM_AVAILABLE ? 'class="josm"' : 'class="no-josm" ') + 'target="_blank">J</a>');
                     } else {
                         $('td:eq(' + i + ')', row).html(linkData);
                     }
