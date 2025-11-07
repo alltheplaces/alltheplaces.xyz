@@ -215,7 +215,11 @@ async function fetchStatsForHistoryListEntry(entry) {
                     let linkData = data[i].toLocaleString("us-US")
 
                     if (linkUrl) {
-                        $('td:eq(' + i + ')', row).html('<a href ="' + linkUrl + '">' + linkData + '</a> <a href="http://127.0.0.1:8111/import?new_layer=true&download_policy=never&upload_policy=never&url=' + linkUrl + '" ' + (JOSM_AVAILABLE ? 'class="josm"' : 'class="no-josm" ') + 'target="_blank">J</a>');
+                        linkHtml = '<a href ="' + linkUrl + '">' + linkData + '</a>';
+                        if ((linkFormat === "geojson") && JOSM_AVAILABLE) {
+                            linkHtml += ' <a href="http://127.0.0.1:8111/import?new_layer=true&download_policy=never&upload_policy=never&url=' + linkUrl + '" target="_blank">J</a>';
+                        }
+                        $('td:eq(' + i + ')', row).html(linkHtml);
                     } else {
                         $('td:eq(' + i + ')', row).html(linkData);
                     }
