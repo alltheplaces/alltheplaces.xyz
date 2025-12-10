@@ -92,6 +92,49 @@
       }
     },
     {
+      "id": "cluster-count",
+      "type": "symbol",
+      "source": "alltheplaces",
+      "source-layer": "alltheplaces",
+      "filter": [
+        "==",
+        [
+          "get",
+          "clustered"
+        ],
+        true
+      ],
+      "layout": {
+        "text-field": [
+          "get",
+          "point_count"
+        ],
+        "text-font": [
+          "Metropolis Bold"
+        ],
+        "text-size": [
+          "interpolate",
+          [
+            "linear"
+          ],
+          [
+            "get",
+            "point_count"
+          ],
+          2,
+          10,
+          100,
+          12,
+          1000,
+          13
+        ],
+        "text-allow-overlap": true
+      },
+      "paint": {
+        "text-color": "#ffffff"
+      }
+    },
+    {
       "id": "output-text",
       "type": "symbol",
       "source": "alltheplaces",
