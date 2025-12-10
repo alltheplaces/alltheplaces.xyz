@@ -6,9 +6,38 @@ body {
     padding: 0;
 }
 
-#map {
+#header {
     position: absolute;
     top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#header a {
+    color: #333;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+#header a:hover {
+    text-decoration: underline;
+}
+
+#header span {
+    color: #666;
+    font-size: 14px;
+}
+
+#map {
+    position: absolute;
+    top: 44px;
     bottom: 0;
     width: 100%;
 }
