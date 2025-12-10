@@ -17,6 +17,33 @@ body {
     max-height: 40vh;
 }
 
+.places-popup .maplibregl-popup-content {
+    border: 2px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 12px;
+}
+
+.places-popup .maplibregl-popup-close-button {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    background: #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    line-height: 26px;
+    text-align: center;
+    right: 4px;
+    top: 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.places-popup .maplibregl-popup-close-button:hover {
+    background: #f0f0f0;
+    color: #000;
+}
+
 .places-popup > div {
     overflow: auto;
 }
