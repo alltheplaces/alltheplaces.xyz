@@ -55,7 +55,7 @@ import style_json from './style.json';
 
             var popup = new maplibregl.Popup({
                 className: "places-popup",
-                maxWidth: "80%",
+                maxWidth: "400px",
             })
                 .setLngLat(e.lngLat)
                 .setDOMContent(popupContents)
