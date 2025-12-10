@@ -13,18 +13,19 @@
     "build:wikidata:css": "esbuild css/wikidata.css --bundle --minify --outfile=assets/css/wikidata.min.css",
     "build:preview": "esbuild src/preview.js --bundle --minify --outfile=assets/js/preview.min.js",
     "build:preview:css": "esbuild css/preview.css --bundle --minify --outfile=assets/css/preview.min.css",
-    "build": "npm run build:map && npm run build:map:css && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders && npm run build:wikidata:css && npm run build:wikidata && npm run build:preview:css && npm run build:preview"
+    "build": "npm run build:map && npm run build:map:css && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders && npm run build:wikidata:css && npm run build:wikidata && npm run build:preview:css && npm run build:preview",
+    "serve": "npx serve ."
   },
   "dependencies": {
-    "@maplibre/maplibre-gl-geocoder": "^1.8.0",
-    "bootstrap": "^5.0.0",
-    "datatables.net-dt": "^2.3.2",
-    "datatables.net-fixedcolumns": "^5.0.4",
+    "@maplibre/maplibre-gl-geocoder": "^1.9.1",
+    "bootstrap": "^5.3.8",
+    "datatables.net-dt": "^2.3.5",
+    "datatables.net-fixedcolumns": "^5.0.5",
     "jquery": "^3.7.1",
-    "maplibre-gl": "^5.3.0",
+    "maplibre-gl": "^5.14.0",
     "pmtiles": "^4.3.0"
   },
   "devDependencies": {
-    "esbuild": "^0.25.2"
+    "esbuild": "^0.27.1"
   }
 }

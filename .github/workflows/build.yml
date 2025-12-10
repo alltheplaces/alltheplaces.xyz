@@ -84,27 +84,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-
-  deploy-preview:
-    if: github.event_name == 'pull_request'
-    environment:
-      name: github-pages-preview
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - name: Deploy PR Preview
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Comment PR with Preview URL
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const previewUrl = '${{ steps.deployment.outputs.page_url }}';
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `✅ Deploy Preview ready! Preview URL: [${previewUrl}](${previewUrl})`
-            });

@@ -19,6 +19,17 @@ import style_json from './style.json';
     }));
 
     map.addControl(new maplibregl.ScaleControl());
+    map.addControl(new maplibregl.NavigationControl({showCompass: false}), "top-left");
+    map.addControl(
+        new maplibregl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: false,
+            },
+            trackUserLocation: true,
+            showUserHeading: true,
+        }),
+        "top-left"
+    );
     map.dragRotate.disable();
     map.touchZoomRotate.disableRotation();
     map.touchPitch.disable();
@@ -44,7 +55,7 @@ import style_json from './style.json';
 
             var popup = new maplibregl.Popup({
                 className: "places-popup",
-                maxWidth: "80%",
+                maxWidth: "400px",
             })
                 .setLngLat(e.lngLat)
                 .setDOMContent(popupContents)
@@ -198,7 +209,8 @@ import style_json from './style.json';
     map.addControl(
         new MaplibreGeocoder(geocoderApi, {
             maplibregl,
-        })
+        }),
+        "top-right"
     );
 })();
 
