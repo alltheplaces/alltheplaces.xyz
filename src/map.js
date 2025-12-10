@@ -19,7 +19,7 @@ import style_json from './style.json';
     }));
 
     map.addControl(new maplibregl.ScaleControl());
-    map.addControl(new maplibregl.NavigationControl({showCompass: false}));
+    map.addControl(new maplibregl.NavigationControl({showCompass: false}), "top-left");
     map.addControl(
         new maplibregl.GeolocateControl({
             positionOptions: {
@@ -27,7 +27,8 @@ import style_json from './style.json';
             },
             trackUserLocation: true,
             showUserHeading: true,
-        })
+        }),
+        "top-left"
     );
     map.dragRotate.disable();
     map.touchZoomRotate.disableRotation();
@@ -208,7 +209,8 @@ import style_json from './style.json';
     map.addControl(
         new MaplibreGeocoder(geocoderApi, {
             maplibregl,
-        })
+        }),
+        "top-right"
     );
 })();
 
