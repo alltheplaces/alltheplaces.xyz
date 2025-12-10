@@ -23,4 +23,5 @@ body {
 
 .places-popup pre {
     white-space: pre-wrap;
+    margin: 0;
 }
