@@ -19,6 +19,7 @@ import style_json from './style.json';
     }));
 
     map.addControl(new maplibregl.ScaleControl());
+    map.addControl(new maplibregl.NavigationControl({showCompass: false}));
     map.addControl(
         new maplibregl.GeolocateControl({
             positionOptions: {
