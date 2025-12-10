@@ -19,6 +19,15 @@ import style_json from './style.json';
     }));
 
     map.addControl(new maplibregl.ScaleControl());
+    map.addControl(
+        new maplibregl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: false,
+            },
+            trackUserLocation: true,
+            showUserHeading: true,
+        })
+    );
     map.dragRotate.disable();
     map.touchZoomRotate.disableRotation();
     map.touchPitch.disable();
