@@ -14,7 +14,8 @@
     "build:preview": "esbuild src/preview.js --bundle --minify --outfile=assets/js/preview.min.js",
     "build:preview:css": "esbuild css/preview.css --bundle --minify --outfile=assets/css/preview.min.css",
     "build": "npm run build:map && npm run build:map:css && npm run build:builds:css && npm run build:builds && npm run build:spiders:css && npm run build:spiders && npm run build:wikidata:css && npm run build:wikidata && npm run build:preview:css && npm run build:preview",
-    "serve": "npx serve ."
+    "copy": "mkdir -p _site/assets/css _site/assets/js _site/assets/images _site/assets/fonts && cp css/style.css _site/assets/css/style.css && cp assets/css/*.min.css _site/assets/css/ && cp assets/js/*.min.js _site/assets/js/ && cp *.html _site/ && cp -R images/* _site/assets/images/ && cp -R fonts/* _site/assets/fonts/",
+    "serve": "npm run build && npm run copy && npx serve _site"
   },
   "dependencies": {
     "@maplibre/maplibre-gl-geocoder": "^1.9.1",
