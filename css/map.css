@@ -47,6 +47,7 @@ body {
 }
 
 .places-popup .maplibregl-popup-content {
+    position: relative;
     border: 2px solid #333;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
@@ -54,6 +55,8 @@ body {
 }
 
 .places-popup .maplibregl-popup-close-button {
+    position: absolute;
+    z-index: 1;
     font-size: 24px;
     font-weight: bold;
     color: #333;
