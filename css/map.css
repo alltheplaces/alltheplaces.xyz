@@ -76,8 +76,9 @@ body {
     color: #000;
 }
 
-.places-popup > div {
+.places-popup .maplibregl-popup-content > div {
     overflow: auto;
+    max-height: calc(40vh - 60px);
 }
 
 .places-popup pre {
