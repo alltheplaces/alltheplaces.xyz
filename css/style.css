@@ -343,8 +343,9 @@ a:hover small {
 }
 
 .wrapper {
-    width: 860px;
+    max-width: 900px;
     margin: 0 auto;
+    padding: 20px;
 }
 
 blockquote {
@@ -406,10 +407,8 @@ kbd {
 }
 
 header {
-    width: 270px;
-    float: left;
-    position: fixed;
-    -webkit-font-smoothing: subpixel-antialiased;
+    margin-bottom: 20px;
+    text-align: right;
 }
 
 ul.downloads {
@@ -473,9 +472,7 @@ strong {
 }
 
 section {
-    width: 500px;
-    float: right;
-    padding-bottom: 50px;
+    padding-bottom: 30px;
 }
 
 small {
@@ -490,58 +487,24 @@ hr {
 }
 
 footer {
-    width: 270px;
-    float: left;
-    position: fixed;
-    bottom: 50px;
-    -webkit-font-smoothing: subpixel-antialiased;
+    text-align: center;
+    padding: 20px 0;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    margin-top: 30px;
 }
 
 @media print, screen and (max-width: 960px) {
     div.wrapper {
-        width: auto;
-        margin: 0;
+        padding: 15px;
     }
 
-    header, section, footer {
-        float: none;
-        position: static;
-        width: auto;
-    }
-
-    header {
-        padding-right: 320px;
-    }
-
-    section {
-        border: 1px solid #e5e5e5;
-        border-width: 1px 0;
-        padding: 20px 0;
-        margin: 0 0 20px;
-    }
-
-    header a small {
-        display: inline;
-    }
-
-    header ul {
-        position: absolute;
-        right: 50px;
-        top: 52px;
     }
 }
 
 @media print, screen and (max-width: 720px) {
     body {
         word-wrap: break-word;
-    }
-
-    header {
-        padding: 0;
-    }
-
-    header ul, header p.view {
-        position: static;
     }
 
     pre, code {
@@ -568,5 +531,269 @@ footer {
         padding: 0.4in;
         font-size: 12pt;
         color: #444;
+    }
+}
+
+/* Homepage styles */
+:root {
+    --bg: #ffffff;
+    --bg-alt: #f8f9fa;
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --text: #111827;
+    --text-secondary: #6b7280;
+    --border: #e5e7eb;
+    --radius: 8px;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+}
+
+.wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 48px 24px;
+}
+
+header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 64px;
+}
+
+header .view a {
+    font-size: 14px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+header .view a:hover {
+    color: var(--primary);
+}
+
+.hero {
+    text-align: center;
+    padding: 0;
+    background: none;
+    margin-bottom: 64px;
+}
+
+.hero h1 {
+    margin: 0 0 16px;
+    font-size: 2.75em;
+    font-weight: 700;
+    color: var(--text);
+    background: none;
+    -webkit-text-fill-color: unset;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.hero p {
+    font-size: 1.125em;
+    color: var(--text-secondary);
+    max-width: 560px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+.nav-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 0 0 64px;
+}
+
+.nav-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.nav-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    text-decoration: none;
+}
+
+.nav-card::before {
+    display: none;
+}
+
+.nav-card .icon {
+    font-size: 24px;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.nav-card h3 {
+    margin: 0 0 6px;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.nav-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.map-preview {
+    position: relative;
+    margin: 0 0 64px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--border);
+}
+
+.map-preview iframe {
+    width: 100%;
+    height: 420px;
+    border: none;
+    display: block;
+}
+
+.map-preview-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    padding: 60px 24px 24px;
+    text-align: center;
+}
+
+.map-preview-overlay::before {
+    display: none;
+}
+
+.map-preview-overlay a {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    padding: 12px 28px;
+    border-radius: var(--radius);
+    border: none;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: background 0.15s;
+}
+
+.map-preview-overlay a:hover {
+    background: var(--primary-dark);
+}
+
+.download-section {
+    background: var(--bg-alt);
+    border-radius: var(--radius);
+    padding: 32px;
+    margin: 0 0 24px;
+    border: 1px solid var(--border);
+}
+
+.download-section h2 {
+    margin: 0 0 8px;
+    color: var(--text);
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.download-section h2::before {
+    display: none;
+}
+
+.download-section p {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+.section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin: 0 0 64px;
+}
+
+.section-grid > div {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+}
+
+.section-grid h2 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.section-grid h2::before {
+    display: none;
+}
+
+.section-grid p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0 0 8px;
+    font-size: 14px;
+}
+
+.section-grid p:last-child {
+    margin-bottom: 0;
+}
+
+.section-grid a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.section-grid a:hover {
+    text-decoration: underline;
+}
+
+footer {
+    text-align: center;
+    padding: 32px 0;
+    color: var(--text-secondary);
+    border-top: 1px solid var(--border);
+    margin-top: 0;
+    font-size: 14px;
+}
+
+footer a {
+    color: var(--text-secondary);
+}
+
+footer a:hover {
+    color: var(--primary);
+}
+
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 2em;
+    }
+    .nav-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .section-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .nav-cards {
+        grid-template-columns: 1fr;
     }
 }

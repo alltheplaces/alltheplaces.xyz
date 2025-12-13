@@ -38,58 +38,66 @@
 <body>
 <div class="wrapper">
     <header>
-        <h1>All The Places</h1>
-        <p>A growing set of web scrapers designed to output consistent geodata about as many places of business in the
-            world as possible.
-        </p>
-
-        <p class="view"><a href="http://github.com/alltheplaces/alltheplaces">View the Project on GitHub <small></small></a>
-        </p>
+        <p class="view"><a href="http://github.com/alltheplaces/alltheplaces">github.com/alltheplaces</a></p>
     </header>
     <section>
-        <p><img src="/assets/images/overview-map.png" alt="Map with points for a recent run of the scrapers"/></p>
+        <div class="hero">
+            <h1>All The Places</h1>
+            <p>An open data project indexing 20+ million POI locations from 4,100+ spiders worldwide. Free to download, explore, and integrate into your projects.</p>
+        </div>
 
-        <h2 id="data-downloads">Data Downloads</h2>
+        <nav class="nav-cards">
+            <a href="/map.html" class="nav-card">
+                <span class="icon">🗺️</span>
+                <h3>Interactive Map</h3>
+                <p>Explore all locations visually</p>
+            </a>
+            <a href="/spiders.html" class="nav-card">
+                <span class="icon">🕷️</span>
+                <h3>Spiders</h3>
+                <p>Browse data sources</p>
+            </a>
+            <a href="/builds.html" class="nav-card">
+                <span class="icon">📦</span>
+                <h3>Downloads</h3>
+                <p>Get the data</p>
+            </a>
+            <a href="/wikidata.html" class="nav-card">
+                <span class="icon">🔗</span>
+                <h3>Wikidata</h3>
+                <p>Brand mappings</p>
+            </a>
+        </nav>
 
-        <p>Downloads of the results from all the scrapers:</p>
+        <div class="map-preview">
+            <iframe src="/map.html" loading="lazy"></iframe>
+            <div class="map-preview-overlay">
+                <a href="/map.html">Open Full Map</a>
+            </div>
+        </div>
 
-        <iframe frameborder="no" border="0" width="400" height="100" scrolling="no"
-                src="https://data.alltheplaces.xyz/runs/latest/info_embed.html"></iframe>
+        <div class="download-section">
+            <h2>Download Data</h2>
+            <p>Latest results from all spiders, updated weekly.</p>
+            <iframe frameborder="no" border="0" width="400" height="100" scrolling="no"
+                    src="https://data.alltheplaces.xyz/runs/latest/info_embed.html"></iframe>
+        </div>
 
-        <p>Other utilities:</p>
-        <ul>
-            <li><a href='/spiders.html'>Check details for the latest build</a></li>
-            <li><a href="/map.html">Browse a map from the latest build</a></li>
-            <li><a href='/wikidata.html'>Check Wikidata statistics</a></li>
-            <li><a href='/builds.html'>View previous builds</a></li>
-        </ul>
-
-        <h2 id="format">Format</h2>
-
-        <p>The linked file is a gzipped <a href="https://github.com/ndjson/ndjson-spec">ndjson</a> where each line is a <a
-                href="https://tools.ietf.org/html/rfc7946#section-3.2">GeoJSON feature</a>.</p>
-
-        <p>Information about the properties contained in each GeoJSON feature are documented <a
-                href="https://github.com/alltheplaces/alltheplaces/blob/master/DATA_FORMAT.md">on the project’s GitHub
-            repository</a>.</p>
-
-        <h2 id="license">License</h2>
-
-        <p><a href="https://creativecommons.org/publicdomain/zero/1.0/"><img
-                src="/assets/images/cc0.png" alt="CC-0 Image Mark"/></a></p>
-
-        <p>The downloads provided above and the data contained therein are released under <a
-                href="https://creativecommons.org/publicdomain/zero/1.0/">Creative Commons’ CC-0 waiver</a>.</p>
-
-        <p>The <a href="https://github.com/alltheplaces/alltheplaces">spider software</a> that produces this work is
-            licensed under the <a href="https://github.com/alltheplaces/alltheplaces/blob/master/LICENSE">MIT
-                license</a>.</p>
+        <div class="section-grid">
+            <div>
+                <h2>Data Format</h2>
+                <p>Downloads are gzipped <a href="https://github.com/ndjson/ndjson-spec">ndjson</a> files. Each line is a <a href="https://tools.ietf.org/html/rfc7946#section-3.2">GeoJSON feature</a> with consistent properties.</p>
+                <p>See the <a href="https://github.com/alltheplaces/alltheplaces/blob/master/DATA_FORMAT.md">format documentation</a> for details.</p>
+            </div>
+            <div>
+                <h2>License</h2>
+                <p>The downloads provided above and the data contained therein are released under Creative Commons' <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC-0 waiver</a>.</p>
+                <p>The spider software that produces this data is licensed under the <a href="https://opensource.org/licenses/MIT">MIT license</a>.</p>
+            </div>
+        </div>
     </section>
     <footer>
         <p>This project is maintained by <a href="http://github.com/alltheplaces">alltheplaces</a></p>
-
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a
-                href="https://github.com/orderedlist">orderedlist</a></small></p>
     </footer>
 </div>
 </body>
