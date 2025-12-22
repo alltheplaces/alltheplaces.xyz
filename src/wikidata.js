@@ -1,4 +1,4 @@
-import {fetchHistoryList} from './shared.js';
+import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
@@ -66,11 +66,12 @@ function isInt(value) {
         loadInsights(document.getElementById('insight-select').value)
     }
 
+    const URL_QUERY_PARAMS = getUrlQueryParams();
     const historyList = await fetchHistoryList()
 
     let dataTable = $("#spider-table").DataTable({
         lengthMenu: [10, 15, 20, 25, 50, 75, 100],
-        pageLength: 10,
+        pageLength: parseInt(URL_QUERY_PARAMS['page_length']) || 10,
         layout: {
             topStart: [
                 'pageLength',
@@ -81,6 +82,7 @@ function isInt(value) {
             bottomEnd: 'paging'
         },
         order: [[1, 'desc']],
+        search: {search: URL_QUERY_PARAMS['search'] || ''},
         columnDefs: [
             { className: 'dt-center', targets: [0,5,6,7] },
             { className: 'dt-right', targets: [1,2,3,4] },
@@ -183,4 +185,7 @@ function isInt(value) {
     selectElement.onchange = newInsightsJsonSelected;
     // Select the most recent run to display initially.
     await loadInsights(historyList[0]["insights_url"])
+
+    // Attach URL update handlers
+    attachDataTableUrlHandlers(dataTable, 10);
 })();

@@ -69,3 +69,40 @@ export function getUrlQueryParams() {
         return {};
     }
 }
+
+/**
+ * Updates a URL query parameter in the browser's address bar without reloading the page.
+ * @param {string} param - The parameter name to update
+ * @param {string|number|null} value - The value to set (or null to remove the parameter)
+ */
+export function updateUrlQueryParam(param, value) {
+    try {
+        const url = new URL(window.location);
+        if (value === null || value === undefined || value === '') {
+            url.searchParams.delete(param);
+        } else {
+            url.searchParams.set(param, value);
+        }
+        window.history.replaceState({}, '', url);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+/**
+ * Attaches event handlers to a DataTable to update URL query parameters when search or page length changes.
+ * @param {Object} dataTable - The DataTable instance
+ * @param {number} defaultPageLength - The default page length (to avoid adding param when at default)
+ */
+export function attachDataTableUrlHandlers(dataTable, defaultPageLength = 10) {
+    // Update URL when search changes
+    dataTable.on('search.dt', function() {
+        updateUrlQueryParam('search', dataTable.search());
+    });
+
+    // Update URL when page length changes
+    dataTable.on('length.dt', function() {
+        const pageLength = dataTable.page.len();
+        updateUrlQueryParam('page_length', pageLength === defaultPageLength ? null : pageLength);
+    });
+}

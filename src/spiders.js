@@ -1,4 +1,4 @@
-import {fetchHistoryList, getUrlQueryParams} from './shared.js';
+import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
@@ -129,7 +129,7 @@ async function fetchStatsForHistoryListEntry(entry) {
             [10, 15, 20, 25, 50, 75, 100, -1],
             [10, 15, 20, 25, 50, 75, 100, "All"],
         ],
-        pageLength: parseFloat(URL_QUERY_PARAMS['page_length']) || 10,
+        pageLength: parseInt(URL_QUERY_PARAMS['page_length']) || 10,
         layout: {
             topStart: [
                 'pageLength',
@@ -232,4 +232,7 @@ async function fetchStatsForHistoryListEntry(entry) {
     $('div.selector-div').html(`<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`);
     document.getElementById('format-select').value = linkFormat;
     document.getElementById('format-select').onchange = onLinkFormatChange;
+
+    // Attach URL update handlers
+    attachDataTableUrlHandlers(dataTable, 10);
 })();

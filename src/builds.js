@@ -1,4 +1,4 @@
-import {fetchHistoryList} from './shared.js';
+import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
@@ -15,6 +15,7 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 (async function () {
+    const URL_QUERY_PARAMS = getUrlQueryParams();
     const data = await fetchHistoryList();
 
 // Render with datatable
@@ -24,8 +25,9 @@ function formatBytes(bytes, decimals = 2) {
             [10, 15, 20, 25, 50, 75, 100, -1],
             [10, 15, 20, 25, 50, 75, 100, "All"],
         ],
-        pageLength: 15,
+        pageLength: parseInt(URL_QUERY_PARAMS['page_length']) || 10,
         order: [[0, 'desc']],
+        search: {search: URL_QUERY_PARAMS['search'] || ''},
         columns: [
             {"title": "Run", "data": "name"},
             {
@@ -96,4 +98,7 @@ function formatBytes(bytes, decimals = 2) {
             }
         },
     });
+
+    // Attach URL update handlers
+    attachDataTableUrlHandlers(dataTable, 10);
 })();
