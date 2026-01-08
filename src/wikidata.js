@@ -1,4 +1,4 @@
-import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers} from './shared.js';
+import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers, updateUrlQueryParam} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
@@ -63,7 +63,11 @@ function isInt(value) {
     }
 
     function newInsightsJsonSelected() {
-        loadInsights(document.getElementById('insight-select').value)
+        const selectedUrl = document.getElementById('insight-select').value;
+        loadInsights(selectedUrl);
+        // Find the run name for the selected URL and update the URL query parameter
+        const selectedRun = historyList.find(h => h.insights_url === selectedUrl);
+        updateUrlQueryParam('run', selectedRun ? selectedRun.name : null);
     }
 
     const URL_QUERY_PARAMS = getUrlQueryParams();
@@ -183,8 +187,18 @@ function isInt(value) {
         selectElement.add(new Option(historyList[i]["name"], historyList[i]["insights_url"]));
     }
     selectElement.onchange = newInsightsJsonSelected;
-    // Select the most recent run to display initially.
-    await loadInsights(historyList[0]["insights_url"])
+
+    // Check if a 'run' parameter is specified in the URL and select it
+    const runParam = URL_QUERY_PARAMS['run'];
+    let selectedRun = historyList[0]; // Default to most recent run
+    if (runParam) {
+        const matchingRun = historyList.find(h => h.name === runParam);
+        if (matchingRun) {
+            selectedRun = matchingRun;
+            selectElement.value = matchingRun.insights_url;
+        }
+    }
+    await loadInsights(selectedRun.insights_url);
 
     // Attach URL update handlers
     attachDataTableUrlHandlers(dataTable, 10);
