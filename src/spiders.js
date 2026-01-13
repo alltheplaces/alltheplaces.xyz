@@ -1,4 +1,4 @@
-import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers} from './shared.js';
+import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers, availableSupplierNames} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
@@ -73,7 +73,8 @@ async function fetchStatsForHistoryListEntry(entry) {
 
 (async function () {
     const URL_QUERY_PARAMS = getUrlQueryParams();
-    const historyList = await fetchHistoryList();
+    let selectedSupplierName = URL_QUERY_PARAMS['supplier_name'] || null;
+    const historyList = await fetchHistoryList(selectedSupplierName);
     historyList.splice(NUM_BUILDS)
     // Fetch the stats JSON for the runs we will be rendering.
     const statsList = await Promise.all(historyList.map(fetchStatsForHistoryListEntry))
@@ -120,6 +121,17 @@ async function fetchStatsForHistoryListEntry(entry) {
     function onLinkFormatChange() {
         linkFormat = document.getElementById('format-select').value
         dataTable.draw("page")
+    }
+
+    function onSupplierNameChange() {
+        const selectedValue = document.getElementById('supplier-select').value;
+        const url = new URL(window.location);
+        if (selectedValue === 'null') {
+            url.searchParams.delete('supplier_name');
+        } else {
+            url.searchParams.set('supplier_name', selectedValue);
+        }
+        window.location.href = url.toString();
     }
 
     // Render with datatable
@@ -229,9 +241,25 @@ async function fetchStatsForHistoryListEntry(entry) {
     });
 
     const linkFormatOptionsHtml = LINK_FORMAT_OPTIONS.map(([val, label], i) => `<option value="${val}">${label}</option>`).join('');
-    $('div.selector-div').html(`<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`);
+    let selectorHtml = `<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`;
+
+    // Add supplier name selector if there are multiple supplier sources available
+    if (availableSupplierNames.length > 1) {
+        const supplierOptionsHtml = '<option value="null">All</option>' +
+            availableSupplierNames.map(name => `<option value="${name}">${name}</option>`).join('');
+        selectorHtml += `<label class="selector-label">Supplier <select id="supplier-select" aria-controls="spider-table">${supplierOptionsHtml}</select></label>`;
+    }
+
+    $('div.selector-div').html(selectorHtml);
     document.getElementById('format-select').value = linkFormat;
     document.getElementById('format-select').onchange = onLinkFormatChange;
+
+    // Set up supplier selector if it exists
+    if (availableSupplierNames.length > 1) {
+        const supplierSelect = document.getElementById('supplier-select');
+        supplierSelect.value = selectedSupplierName || 'null';
+        supplierSelect.onchange = onSupplierNameChange;
+    }
 
     // Attach URL update handlers
     attachDataTableUrlHandlers(dataTable, 10);
