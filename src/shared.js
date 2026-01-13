@@ -1,7 +1,15 @@
 /**
- * Return a list of history entries, sorted by most recent first.
+ * List of all available supplier names from the configuration.
+ * This is populated when fetchHistoryList() is first called.
+ * @type {string[]}
  */
-export async function fetchHistoryList() {
+export let availableSupplierNames = [];
+
+/**
+ * Return a list of history entries, sorted by most recent first.
+ * @param {string|null} select_name - If set, only select config URLs from entries with a matching name
+ */
+export async function fetchHistoryList(select_name = null) {
     // The default configuration is the direct ATP history.json
     let my_histories = [
         {
@@ -21,6 +29,13 @@ export async function fetchHistoryList() {
         // We catch the exception and proceed here as it enables the HTML to be used by the browser
         // on the local file system without crashing out. Handy for development sometimes.
         console.error(error)
+    }
+    // Store all available supplier names before filtering
+    availableSupplierNames = my_histories.map(history => history.name);
+
+    // Filter by name if select_name is provided
+    if (select_name !== null && select_name !== undefined && select_name !== '') {
+        my_histories = my_histories.filter(history => history.name === select_name)
     }
     let history_runs = []
     for (let i = 0; i < my_histories.length; i++) {
