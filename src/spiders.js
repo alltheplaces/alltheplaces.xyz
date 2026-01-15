@@ -269,7 +269,7 @@ async function fetchStatsForHistoryListEntry(entry) {
     const linkFormatOptionsHtml = LINK_FORMAT_OPTIONS.map(([val, label], i) => `<option value="${val}">${label}</option>`).join('');
     let selectorHtml = `<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`;
 
-    // Add num builds selector
+    // Add selector to control number of previous runs displayed
     const numRunsHtml = Array.from({length: 10}, (_, i) => i + 1)
         .map(num => `<option value="${num}">${num}</option>`).join('');
     selectorHtml += `<label class="selector-label">Previous <select id="num-runs-select" aria-controls="spider-table">${numRunsHtml}</select> runs</label>`;
@@ -282,14 +282,12 @@ async function fetchStatsForHistoryListEntry(entry) {
     }
 
     $('div.selector-div').html(selectorHtml);
+
+    // Add the initial values to the various controls and attach update handlers
     document.getElementById('format-select').value = linkFormat;
     document.getElementById('format-select').onchange = onLinkFormatChange;
-
-    // Set up num builds selector
     document.getElementById('num-runs-select').value = numRuns;
     document.getElementById('num-runs-select').onchange = onNumRunsChange;
-
-    // Set up supplier selector if it exists
     if (availableSupplierNames.length > 1) {
         const supplierSelect = document.getElementById('supplier-select');
         supplierSelect.value = selectedSupplierName || 'null';
