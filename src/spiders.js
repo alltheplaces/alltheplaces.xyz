@@ -1,4 +1,4 @@
-import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers, availableSupplierNames} from './shared.js';
+import {fetchHistoryList, getUrlQueryParams, attachDataTableUrlHandlers, updateUrlQueryParam, availableSupplierNames} from './shared.js';
 import $ from "jquery";
 import DataTable from 'datatables.net-dt';
 
@@ -24,7 +24,8 @@ const LINK_FORMAT_OPTIONS = [
     ['logs', 'Spider error logs'],
 ];
 const GITHUB_URL = "https://github.com/alltheplaces/alltheplaces/tree/master";
-let NUM_BUILDS = 5; // Maximum number of builds to display.
+const DEFAULT_NUM_RUNS = 5; // Default maximum number of runs to display / compare.
+let numRuns = DEFAULT_NUM_RUNS;
 let JOSM_AVAILABLE = false;
 
 fetch("http://127.0.0.1:8111/version")
@@ -40,7 +41,7 @@ function calculateStability(row) {
     // Normalise the POI count data such that each run outputs the same maximum number.
     let NORMALISED_MAX_POIS = 10000.0
     let maxFeatures = 0;
-    for (let i = 2; i <= NUM_BUILDS + 1; i++) {
+    for (let i = 2; i <= numRuns + 1; i++) {
         if (row[i] > maxFeatures) {
             maxFeatures = row[i]
         }
@@ -50,7 +51,7 @@ function calculateStability(row) {
         let sumSqDeviations = 0;
         let runCount = 0;
         // Calculate the variance from the MAXIMUM value for each (normalised count) run that occurred.
-        for (let i = 2; i <= NUM_BUILDS + 1; i++) {
+        for (let i = 2; i <= numRuns + 1; i++) {
             if (row[i] != null) {
                 let dev = NORMALISED_MAX_POIS - (multiplier * row[i]);
                 sumSqDeviations += (dev * dev);
@@ -73,9 +74,15 @@ async function fetchStatsForHistoryListEntry(entry) {
 
 (async function () {
     const URL_QUERY_PARAMS = getUrlQueryParams();
+
+    // Set number of ATP runs to compare from URL parameter or use default
+    numRuns = parseInt(URL_QUERY_PARAMS['num_runs']) || DEFAULT_NUM_RUNS;
+    if (numRuns < 1) numRuns = 1;
+    if (numRuns > 10) numRuns = 10;
+
     let selectedSupplierName = URL_QUERY_PARAMS['supplier_name'] || null;
     const historyList = await fetchHistoryList(selectedSupplierName);
-    historyList.splice(NUM_BUILDS)
+    historyList.splice(numRuns)
     // Fetch the stats JSON for the runs we will be rendering.
     const statsList = await Promise.all(historyList.map(fetchStatsForHistoryListEntry))
 
@@ -120,7 +127,19 @@ async function fetchStatsForHistoryListEntry(entry) {
 
     function onLinkFormatChange() {
         linkFormat = document.getElementById('format-select').value
+        updateUrlQueryParam('link_format', linkFormat === 'geojson' ? null : linkFormat);
         dataTable.draw("page")
+    }
+
+    function onNumRunsChange() {
+        const selectedValue = parseInt(document.getElementById('num-runs-select').value);
+        const url = new URL(window.location);
+        if (selectedValue === DEFAULT_NUM_RUNS) {
+            url.searchParams.delete('num_runs');
+        } else {
+            url.searchParams.set('num_runs', selectedValue);
+        }
+        window.location.href = url.toString();
     }
 
     function onSupplierNameChange() {
@@ -135,6 +154,13 @@ async function fetchStatsForHistoryListEntry(entry) {
     }
 
     // Render with datatable
+    // First, create the footer HTML dynamically based on number of runs selected.
+    const footerHtml = '<tr>' +
+        '<th></th><th></th>' +  // Spider name and Stability columns
+        Array.from({length: numRuns}, () => '<th></th>').join('') +
+        '</tr>';
+    $('#spider-table tfoot').html(footerHtml);
+
     let dataTable = $("#spider-table").DataTable({
         data,
         lengthMenu: [
@@ -184,7 +210,7 @@ async function fetchStatsForHistoryListEntry(entry) {
                 className: 'dt-center', targets: [1]
             },
             {
-                className: 'dt-right', targets: [2, 3, 4, 5, 6]
+                className: 'dt-right', targets: Array.from({length: numRuns}, (_, i) => i + 2)
             },
             {
                 targets: statsList.map((_, i) => i + 2),
@@ -196,7 +222,7 @@ async function fetchStatsForHistoryListEntry(entry) {
         "footerCallback": function (row, data, start, end, display) {
             let api = this.api()
             // Total up the numeric columns (all next to each)
-            let columns = [2, 3, 4, 5, 6]
+            let columns = Array.from({length: numRuns}, (_, i) => i + 2);
             for (let i in columns) {
                 let total = api
                     .column(columns[i], {filter: "applied"})
@@ -209,7 +235,7 @@ async function fetchStatsForHistoryListEntry(entry) {
             }
         },
         "rowCallback": function (row, data, displayNum, displayIndex, dataIndex) {
-            for (let i = 2; i <= 7; i++) {
+            for (let i = 2; i <= numRuns + 1; i++) {
                 if (data[i] || data[i] === 0) {
                     let linkUrl = null
                     if ((linkFormat === "map") && historyList[i - 2]["output_url"]) {
@@ -227,7 +253,7 @@ async function fetchStatsForHistoryListEntry(entry) {
                     let linkData = data[i].toLocaleString("us-US")
 
                     if (linkUrl) {
-                        linkHtml = '<a href ="' + linkUrl + '">' + linkData + '</a>';
+                        let linkHtml = '<a href ="' + linkUrl + '">' + linkData + '</a>';
                         if ((linkFormat === "geojson") && JOSM_AVAILABLE) {
                             linkHtml += ' <a href="http://127.0.0.1:8111/import?new_layer=true&download_policy=never&upload_policy=never&url=' + linkUrl + '" target="_blank">J</a>';
                         }
@@ -243,6 +269,11 @@ async function fetchStatsForHistoryListEntry(entry) {
     const linkFormatOptionsHtml = LINK_FORMAT_OPTIONS.map(([val, label], i) => `<option value="${val}">${label}</option>`).join('');
     let selectorHtml = `<label class="selector-label">Links give <select id="format-select" aria-controls="spider-table">${linkFormatOptionsHtml}</select></label>`;
 
+    // Add selector to control number of previous runs displayed
+    const numRunsHtml = Array.from({length: 10}, (_, i) => i + 1)
+        .map(num => `<option value="${num}">${num}</option>`).join('');
+    selectorHtml += `<label class="selector-label">Previous <select id="num-runs-select" aria-controls="spider-table">${numRunsHtml}</select> runs</label>`;
+
     // Add supplier name selector if there are multiple supplier sources available
     if (availableSupplierNames.length > 1) {
         const supplierOptionsHtml = '<option value="null">All</option>' +
@@ -251,10 +282,12 @@ async function fetchStatsForHistoryListEntry(entry) {
     }
 
     $('div.selector-div').html(selectorHtml);
+
+    // Add the initial values to the various controls and attach update handlers
     document.getElementById('format-select').value = linkFormat;
     document.getElementById('format-select').onchange = onLinkFormatChange;
-
-    // Set up supplier selector if it exists
+    document.getElementById('num-runs-select').value = numRuns;
+    document.getElementById('num-runs-select').onchange = onNumRunsChange;
     if (availableSupplierNames.length > 1) {
         const supplierSelect = document.getElementById('supplier-select');
         supplierSelect.value = selectedSupplierName || 'null';
