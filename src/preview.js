@@ -1,6 +1,5 @@
 import maplibregl from 'maplibre-gl';
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Get the URL parameters
     const urlParams = new URLSearchParams(window.location.search);
@@ -28,6 +27,12 @@ document.addEventListener('DOMContentLoaded', function () {
             cluster: true,
             clusterMaxZoom: 14,
             clusterRadius: 50
+        });
+
+        // Separate source for non-point geometries (clustering only supports Points)
+        map.addSource('non-points', {
+            type: 'geojson',
+            data: geoJsonUrl,
         });
 
         // Add a layer for clustered points
@@ -85,19 +90,55 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // Show a popup when hovering over an unclustered point
-        const popup = new maplibregl.Popup({
-            closeOnClick: false,
-            maxWidth: '400px'
+        // Add layers for LineString / MultiLineString
+        map.addLayer({
+            id: 'line-layer',
+            type: 'line',
+            source: 'non-points',
+            filter: [
+                'in',
+                ['geometry-type'],
+                ['literal', ['LineString', 'MultiLineString']],
+            ],
+            paint: {
+                'line-color': '#11b4da',
+                'line-width': 3,
+            },
         });
-        let stickyPopup = false;
 
-        map.on('mouseenter', 'unclustered-point', function (e) {
-            map.getCanvas().style.cursor = 'pointer';
-            const feature = e.features[0];
-            const coordinates = feature.geometry.coordinates.slice();
-            let description = "<table>";
-            // Sort the properties by key
+        // Add layers for Polygon / MultiPolygon
+        map.addLayer({
+            id: 'polygon-fill',
+            type: 'fill',
+            source: 'non-points',
+            filter: [
+                'in',
+                ['geometry-type'],
+                ['literal', ['Polygon', 'MultiPolygon']],
+            ],
+            paint: {
+                'fill-color': '#11b4da',
+                'fill-opacity': 0.3,
+            },
+        });
+        map.addLayer({
+            id: 'polygon-outline',
+            type: 'line',
+            source: 'non-points',
+            filter: [
+                'in',
+                ['geometry-type'],
+                ['literal', ['Polygon', 'MultiPolygon']],
+            ],
+            paint: {
+                'line-color': '#11b4da',
+                'line-width': 2,
+            },
+        });
+
+        // Helper to build popup HTML from feature properties
+        function buildPopupHTML(feature) {
+            let description = '<table>';
             const sortedProperties = {};
             Object.keys(feature.properties).sort().forEach(function (key) {
                 sortedProperties[key] = feature.properties[key];
@@ -117,35 +158,61 @@ document.addEventListener('DOMContentLoaded', function () {
                 description += `<tr><th>${key}</th><td>${value}</td></tr>`;
             }
             description += "</table>";
+            return description;
+        }
 
-            // Ensure that if the map is zoomed out such that multiple
-            // copies of the feature are visible, the popup appears
-            // over the copy being pointed to
-            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-            }
-
-            popup
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
+        const popup = new maplibregl.Popup({
+            closeOnClick: false,
+            maxWidth: '400px',
         });
+        let stickyPopup = false;
 
-        // Click on the point to keep the popup open
-        map.on('click', 'unclustered-point', function (e) {
-            map.getCanvas().style.cursor = 'pointer';
-            stickyPopup = true;
+        const interactiveLayers = [
+            'unclustered-point',
+            'line-layer',
+            'polygon-fill',
+        ];
+
+        interactiveLayers.forEach(function (layerId) {
+            map.on('mouseenter', layerId, function (e) {
+                map.getCanvas().style.cursor = 'pointer';
+                const feature = e.features[0];
+                const description = buildPopupHTML(feature);
+
+                // For points use the feature coordinates; for lines/polygons use the cursor position
+                let lngLat;
+                if (feature.geometry.type === 'Point') {
+                    const coordinates = feature.geometry.coordinates.slice();
+
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+                    lngLat = coordinates;
+                } else {
+                    lngLat = e.lngLat;
+                }
+
+                popup.setLngLat(lngLat).setHTML(description).addTo(map);
+            });
+
+            // Click on the point to keep the popup open
+            map.on('click', layerId, function () {
+                stickyPopup = true;
+            });
+
+            // Hide the popup when the mouse leaves the point
+            map.on('mouseleave', layerId, function () {
+                map.getCanvas().style.cursor = '';
+                if (!stickyPopup) popup.remove();
+            });
         });
 
         // Unset the sticky popup when the popup is closed
         popup.on('close', function () {
             stickyPopup = false;
-        });
-
-        // Hide the popup when the mouse leaves the point
-        map.on('mouseleave', 'unclustered-point', function () {
-            map.getCanvas().style.cursor = '';
-            if (!stickyPopup) popup.remove();
         });
 
         // Click on a clustered point to zoom to that cluster

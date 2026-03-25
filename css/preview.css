@@ -13,3 +13,9 @@ html, body, #map {
 .maplibregl-popup-content table th {
     text-align: right;
 }
+
+.maplibregl-popup-content table td {
+    max-width: 250px;
+    overflow-wrap: break-word;
+    word-break: break-all;
+}
