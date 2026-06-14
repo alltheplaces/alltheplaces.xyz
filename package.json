@@ -27,6 +27,6 @@
     "pmtiles": "^4.3.0"
   },
   "devDependencies": {
-    "esbuild": "^0.27.1"
+    "esbuild": "^0.28.1"
   }
 }
