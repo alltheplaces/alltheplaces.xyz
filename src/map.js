@@ -7,12 +7,18 @@ import style_json from './style.json';
     const protocol = new pmtiles.Protocol({metadata: true});
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
+    const map_style = await fetch("https://api.protomaps.com/styles/v2/dark.json?key=a19ca255a685ed70").then(r => r.json());
     const {pmtiles_url} = await fetch("https://data.alltheplaces.xyz/runs/latest.json").then(r => r.json());
-    style_json.sources.alltheplaces.url = `pmtiles://${pmtiles_url}`;
+
+    map_style.sources.alltheplaces = {
+      type: "vector",
+      url: `pmtiles://${pmtiles_url}`,
+    };
+    map_style.layers.push(...style_json.layers);
 
     const map = (window.map = new maplibregl.Map({
         container: "map",
-        style: style_json,
+        style: map_style,
         center: [0, 0],
         zoom: 1,
         hash: true,
