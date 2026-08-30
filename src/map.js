@@ -7,7 +7,7 @@ import style_json from './style.json';
     const protocol = new pmtiles.Protocol({metadata: true});
     maplibregl.addProtocol("pmtiles", protocol.tile);
 
-    const map_style = await fetch("https://api.protomaps.com/styles/v2/dark.json?key=a19ca255a685ed70").then(r => r.json());
+    const map_style = await fetch("https://api.protomaps.com/styles/v2/dark.json?key=6b3075154236e963").then(r => r.json());
     const {pmtiles_url} = await fetch("https://data.alltheplaces.xyz/runs/latest.json").then(r => r.json());
 
     map_style.sources.alltheplaces = {
