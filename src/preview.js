@@ -136,6 +136,18 @@ document.addEventListener('DOMContentLoaded', function () {
             },
         });
 
+        // Fit the viewport to all loaded features instead of the default [0, 0]
+        let fitBoundsOnce = true;
+        map.on('sourcedata', function (e) {
+            if (e.sourceId !== 'points' || !e.isSourceLoaded || !fitBoundsOnce) return;
+            fitBoundsOnce = false;
+            map.getSource('points').getBounds().then(function (bounds) {
+                if (!bounds.isEmpty()) {
+                    map.fitBounds(bounds, { padding: 100 });
+                }
+            });
+        });
+
         // Helper to build popup HTML from feature properties
         function buildPopupHTML(feature) {
             let description = '<table>';
